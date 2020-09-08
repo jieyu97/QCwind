@@ -1,0 +1,56 @@
+#' @name bias_correction
+#' @title Function to do bias correction
+#' @description Using different methods to calibrate the systematic bias between observed
+#' and true data.
+#' @param obs.data a numeric vector of observed data.
+#' @param true.data a numeric vector of true data.
+#' @param method a character indicating the choosen bias correction method;
+#' `linear_scaling`: the linear scaling method, fitting the relationship between observed and
+#' true data by a linear model;
+#' `empirical_quantile`: the empirical quantile mapping method, mapping the quantiles between
+#' the empirical cumulative density functions of observed and true data.
+#' @return a function that can correct new observed data.
+#' @export
+#' @examples
+#' wow_test_bc = bias_correction(bc_wow_test, bc_knmi_test, 'empirical_quantile')
+
+bias_correction <- function(obs.data, true.data, method = 'empirical_quantile')
+{
+  require(tidyverse)
+  stopifnot(is.numeric(obs.data), is.numeric(true.data), length(obs.data) == length(true.data) )
+  stopifnot(is.character(method), method %in% c('linear_scaling', 'empirical_quantile') )
+
+  # # for test
+  # obs.data = bc_wow_test
+  # true.data = bc_knmi_test
+  # method = 'empirical_quantile'
+
+  noNA_label = !is.na(obs.data) & !is.na(true.data)
+  obs_data = obs.data[noNA_label]
+  true_data = true.data[noNA_label]
+
+  if (method == "linear_scaling")
+  {
+    mu.obs = mean(obs_data, na.rm = TRUE)
+    mu.true = mean(true_data, na.rm = TRUE)
+    sigma.obs = sd(obs_data, na.rm = TRUE)
+    sigma.true = sd(true_data, na.rm = TRUE)
+
+    bc.function = function(x) {
+      (sigma.true/sigma.obs) * (x - mu.obs) + mu.true
+    }
+  }
+  else if (method == "empirical_quantile")
+  {
+    ecdf.obs = ecdf(obs_data)
+    # ecdf.true = ecdf(true_data)
+    # ecdf_middle = ecdf.obs(obs_data)
+    # wow_test_ecdf = quantile(true_data, ecdf_middle, na.rm = TRUE, names = TRUE, type = 2)
+
+    bc.function = function(x) {
+      quantile(true_data, ecdf.obs(x), na.rm = TRUE, names = TRUE, type = 2)
+    }
+  }
+
+  return(bc.function)
+}
