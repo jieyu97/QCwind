@@ -4,12 +4,14 @@
 \alias{bias_correction}
 \title{Function to do bias correction}
 \usage{
-bias_correction(obs.data, true.data, method = "empirical_quantile")
+bias_correction(train.obs, train.true, test.obs, method = "empirical_quantile")
 }
 \arguments{
-\item{obs.data}{a numeric vector of observed data.}
+\item{train.obs}{a numeric vector of training observed data to build the bias correction model.}
 
-\item{true.data}{a numeric vector of true data.}
+\item{train.true}{a numeric vector of training true data to build the bias correction model.}
+
+\item{test.obs}{a numeric vector of test observed data to be calibrated.}
 
 \item{method}{a character indicating the choosen bias correction method;
 `linear_scaling`: the linear scaling method, fitting the relationship between observed and
