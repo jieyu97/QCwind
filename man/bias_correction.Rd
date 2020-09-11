@@ -2,7 +2,7 @@
 % Please edit documentation in R/bias_correction.R
 \name{bias_correction}
 \alias{bias_correction}
-\title{Function to do bias correction}
+\title{Calibrating the bias of observed data}
 \usage{
 bias_correction(train.obs, train.true, test.obs, method = "empirical_quantile")
 }
@@ -20,12 +20,12 @@ true data by a linear model;
 the empirical cumulative density functions of observed and true data.}
 }
 \value{
-a function that can correct new observed data.
+a numeric vector that contains the corrected `test.obs` data.
 }
 \description{
 Using different methods to calibrate the systematic bias between observed
 and true data.
 }
 \examples{
-wow_test_bc = bias_correction(bc_wow_test, bc_knmi_test, 'empirical_quantile')
+wow_test_bc = bias_correction(bc_wow_test, bc_knmi_test, bc_wow_test)
 }

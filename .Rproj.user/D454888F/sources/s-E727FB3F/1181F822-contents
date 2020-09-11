@@ -1,5 +1,5 @@
 #' @name bias_correction
-#' @title Function to do bias correction
+#' @title Calibrating the bias of observed data
 #' @description Using different methods to calibrate the systematic bias between observed
 #' and true data.
 #' @param train.obs a numeric vector of training observed data to build the bias correction model.
@@ -10,10 +10,10 @@
 #' true data by a linear model;
 #' `empirical_quantile`: the empirical quantile mapping method, mapping the quantiles between
 #' the empirical cumulative density functions of observed and true data.
-#' @return a function that can correct new observed data.
+#' @return a numeric vector that contains the corrected `test.obs` data.
 #' @export
 #' @examples
-#' wow_test_bc = bias_correction(bc_wow_test, bc_knmi_test, 'empirical_quantile')
+#' wow_test_bc = bias_correction(bc_wow_test, bc_knmi_test, bc_wow_test)
 
 bias_correction <- function(train.obs, train.true, test.obs, method = 'empirical_quantile')
 {
@@ -53,5 +53,7 @@ bias_correction <- function(train.obs, train.true, test.obs, method = 'empirical
     }
   }
 
-  return(bc.function)
+  test.obs.corrected = bc.function(test.obs)
+
+  return(test.obs.corrected)
 }
