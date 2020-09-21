@@ -22,10 +22,10 @@ hello <- function() {
 # devtools::document()
 # devtools::install()
 # devtools::build_manual()
-# vignette
+# devtools::build_vignettes()
 # compare two/three KNMI station for bc.
 # quantiles, latitude, longitude of KNMI stations
 # climate plots
 # temporal: backward and forward
-# Ctrl + Shift + D, if you’re using RStudio
+# Ctrl + Shift + D, if using RStudio
 
