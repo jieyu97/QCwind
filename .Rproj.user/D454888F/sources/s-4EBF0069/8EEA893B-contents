@@ -1,0 +1,130 @@
+library(QCwind)
+
+final_label = c(1,2,3,4,6,7,8,9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 26, 27, 28,
+                30, 31, 32, 33, 36, 37, 41, 42, 43, 44, 45, 48, 50, 53)
+persist_wow39 = c()
+Sys.time()
+for (i in final_label) {
+  wowtest_step = used_station_data_each[[i]]
+  wowtest_persist = temporal_persist_check(wowtest_step,
+                                           data.column = 'windspeed_metrepersecond',
+                                           datetime.column = 'datetime',
+                                           persist.duration = 3600,
+                                           min.variation = 0.1,
+                                           fail.flag = 'TS2')
+  attr(wowtest_persist, "station_id") = as.character(wowtest_step$station_id[1])
+  persist_wow39[[i]] = wowtest_persist
+}
+Sys.time()
+save.image("~/Documents/wow_persist_analyse.RData")
+
+
+wowtest = used_station_data_each[[19]]
+wowtest_range = range_check(wowtest, 'windspeed_metrepersecond',
+                                       upper.bound = 35.36603, fail.flag = 'RS')
+attributes(wowtest_range)
+### step test
+wowtest_step = temporal_step_check(wowtest_range,
+                                          data.column = 'windspeed_metrepersecond',
+                                          datetime.column = 'datetime',
+                                          step.duration = 720,
+                                          max.variation = 18.4691,
+                                          fail.flag = 'TS1')
+attr(wowtest_step, "station_id") = as.character(wowtest_range$station_id[1])
+attributes(wowtest_step)
+which(is.na(wowtest_step$new_data_step))
+### persistence test
+wowtest_persist = temporal_persist_check(wowtest_step,
+                                                data.column = 'windspeed_metrepersecond',
+                                                datetime.column = 'datetime',
+                                                persist.duration = 3600,
+                                                min.variation = 0.1,
+                                                fail.flag = 'TS2')
+attr(wowtest_persist, "station_id") = as.character(wowtest_step$station_id[1])
+attributes(wowtest_persist)
+
+
+library(tidyverse)
+library(lubridate)
+# analyse
+n = 2
+wow_test = persist_wow39[[n]]
+
+percent = tibble(station = final_label,
+                 failed_persist = 0,
+                 failed_zeros = 1,
+                 failed_nonzeros = 0,
+                 zero_percent = 0)
+for (i in 1:39) {
+  n = final_label[i]
+  wow_test = persist_wow39[[n]]
+  flags = which(wow_test$flag == 'TS2')
+  # length(flags)
+  # nrow(wow_test)
+  percent$failed_persist[i] = length(flags) / nrow(wow_test) *100
+  flags_zero = which(wow_test$flag == 'TS2' & wow_test$windspeed_metrepersecond == 0)
+  flags_others = which(wow_test$flag == 'TS2' & wow_test$windspeed_metrepersecond != 0)
+  percent$failed_zeros[i] = length(flags_zero) / length(flags) *100
+  percent$failed_nonzeros[i] = length(flags_others) / length(flags) *100
+
+  test_wow = used_station_data_each[[n]]
+  zero_speed = which(test_wow$windspeed_metrepersecond == 0)
+  percent$zero_percent[i] = length(zero_speed) / nrow(test_wow) *100
+}
+
+
+
+
+# n = 33,48,41,36,19,4,18,13
+n = 19
+wow_test = persist_wow39[[n]]
+flags = which(wow_test$flag == 'TS2')
+flags_zero = which(wow_test$flag == 'TS2' & wow_test$windspeed_metrepersecond == 0)
+flags_others = which(wow_test$flag == 'TS2' & wow_test$windspeed_metrepersecond != 0)
+label = which( day(wow_test$datetime) == 14 & month(wow_test$datetime) == 9 & year(wow_test$datetime) == 2017 )
+label = 415396:415414
+
+ggplot() +
+  geom_point(data = wow_test,
+             aes(datetime, windspeed_metrepersecond), color = 'grey') +
+  geom_point(data = wow_test[flags_others,],
+             aes(datetime, windspeed_metrepersecond), color = 'steelblue', alpha = 0.6) +
+  geom_point(data = wow_test[flags_zero,],
+             aes(datetime, windspeed_metrepersecond), color = 'darkred', alpha = 0.4) +
+  ylim(c(0,10)) + labs(title = 'blue: nonzero & failed; red: zero & failed')
+ggplot() +
+  geom_histogram(data = wow_test, aes(windspeed_metrepersecond), alpha = 0.6, binwidth = 0.1) +
+  geom_histogram(data = wow_test, aes(new_data), fill = 'forestgreen', binwidth = 0.1) +
+  labs(title = 'binwidth = 0.1')
+
+ggplot() +
+  geom_point(data = wow_test[label,],
+             aes(datetime, windspeed_metrepersecond), color = 'grey') +
+  geom_point(data = wow_test[intersect(flags_others, label),],
+             aes(datetime, windspeed_metrepersecond), color = 'steelblue', alpha = 0.6) +
+  geom_point(data = wow_test[intersect(flags_zero, label),],
+             aes(datetime, windspeed_metrepersecond), color = 'darkred', alpha = 0.4)
+
+### get filtered nonzero after persistence test
+n = 19
+wow_test = persist_wow39[[n]]
+attributes(wow_test)
+flags = which(wow_test$flag == 'TS2')
+flags_zero = which(wow_test$flag == 'TS2' & wow_test$windspeed_metrepersecond == 0)
+flags_others = which(wow_test$flag == 'TS2' & wow_test$windspeed_metrepersecond != 0)
+noflags = which(wow_test$flag != 'TS2')
+
+wow_standardQC = wow_test[union(flags_zero,noflags),] %>%
+  select(datetime, windspeed_metrepersecond)
+wow_standardQC = wow_standardQC[order(wow_standardQC$datetime),]
+which(is.na(wow_standardQC$windspeed_metrepersecond))
+
+wow_standardQC_uniform = uniform_data(data = wow_standardQC,
+                                      data.column = 'windspeed_metrepersecond',
+                                      datetime.column = 'datetime',
+                                      timeseq = datetime_sequence,
+                                      method = "average")
+
+
+
+
