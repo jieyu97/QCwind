@@ -8,6 +8,7 @@
 #' @export
 
 # @examples
+# to be added
 # windrose_plot(wind_df, wind_df$windspeed, wind_df$winddirection)
 
 windrose_plot <- function(data, speed, direction)

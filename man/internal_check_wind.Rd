@@ -28,8 +28,3 @@ Generating a new sequence of flags, where a `P` means that observation passes th
 and a pre-defined flag name `fail.flag` means that observation fails the internal check;
 Also outputting two new sequences of wind speed and gust observations after removing failed observations.
 }
-\examples{
-wow_test_internal_check = internal_check_wind(wow_test, speed.column = 'windspeed_metrepersecond',
-gust.column = 'windgust_metrepersecond', fail.flag = 'IN')
-attributes(wow_test_internal_check)
-}

@@ -21,10 +21,16 @@
 #' the observation data after removing failed observations.
 #' @export
 #' @examples
-#' wow_test_step_check = temporal_step_check(wow_test_each[[1]],
-#' data.column = 'windspeed_metrepersecond', datetime.column = 'datetime',
-#' step.duration = 720, max.variation = 5, fail.flag = 'TS1')
-#' attributes(wow_test_step_check)
+# library(tidyverse)
+# datetime = as.POSIXlt(seq(0,60000,600), origin = "2017-02-03 08:00:00")
+# test = tibble(datetime = datetime,
+#               windspeed = c(rep(10.2,5),seq(20,25,0.1),rep(9.3,45)))
+# test_step_check = temporal_step_check(test, data.column = 'windspeed',
+#                                       datetime.column = 'datetime',
+#                                       step.duration = 720,
+#                                       max.variation = 5, fail.flag = 'TS1')
+# attributes(test_step_check)
+# test_step_check
 
 temporal_step_check <- function(data, data.column, datetime.column,
                                 step.duration, max.variation, fail.flag)
@@ -48,10 +54,11 @@ temporal_step_check <- function(data, data.column, datetime.column,
   # max.variation = 5
   # fail.flag = 'TS1'
 
-  data = as.data.frame(data)
+  data = as_tibble(data)
   obs.data = data[[data.column]]    # data[,data.column]
   obs.datetime = data[[datetime.column]]    # data[,datetime.column]
   attr(obs.datetime, 'tzone') = "GMT"
+  data = data[order(data[[datetime.column]]),]
 
   time_series = xts(x = obs.data, order.by = obs.datetime)
   step_dt_seq = tibble('start' = obs.datetime - step.duration, 'end' = obs.datetime)
@@ -71,20 +78,20 @@ temporal_step_check <- function(data, data.column, datetime.column,
   lag.diff.data = abs(coredata(time_series) - lag.data)
   # lead.diff.data = abs(coredata(time_series) - lead.data)
 
-  output_data = data[order(data[[datetime.column]]),] %>%
-    mutate(flag = ifelse( (variation.data > max.variation &
+  output_data = data %>%
+    mutate(flag_step = ifelse( ( !is.na(variation.data) & variation.data > max.variation &
                              lag.diff.data > max.variation ),
                           fail.flag, ifelse(!is.na(variation.data), 'P', 'isolated') ) ) %>%
     # mutate(flag = ifelse( (variation.data > max.variation &
     #                           (lag.diff.data > max.variation |
     #                           lead.diff.data > max.variation) ),
     #                        fail.flag, ifelse(!is.na(variation.data), 'P', 'isolated') ) ) %>%
-    mutate(new_data = ifelse( flag == fail.flag, NA, coredata(time_series) ) )
+    mutate(new_data_step = ifelse( flag_step == fail.flag, NA, coredata(time_series) ) )
 
-  output_data = as_tibble(output_data)
+  # output_data = as_tibble(output_data)
 
-  attr(output_data, 'input_missing_value_percentage') = sum(!is.na(obs.data)) / length(obs.data)
-  attr(output_data, 'pass_percentage') = sum(!is.na(output_data[['new_data']])) / sum(!is.na(obs.data))
+  attr(output_data, 'input_valid_data_percentage') = sum(!is.na(obs.data)) / length(obs.data)
+  attr(output_data, 'pass_percentage') = sum(!is.na(output_data[['new_data_step']])) / sum(!is.na(obs.data))
 
   return(output_data)
 }

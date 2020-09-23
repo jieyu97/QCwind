@@ -26,6 +26,3 @@ a numeric vector that contains the corrected `test.obs` data.
 Using different methods to calibrate the systematic bias between observed
 and true data.
 }
-\examples{
-wow_test_bc = bias_correction(bc_wow_test, bc_knmi_test, bc_wow_test)
-}

@@ -13,22 +13,25 @@
 #' @return a numeric vector that contains the corrected `test.obs` data.
 #' @export
 #' @examples
-#' wow_test_bc = bias_correction(bc_wow_test, bc_knmi_test, bc_wow_test)
+# bc_train_obs = c(0:8,9,9,9,9)
+# bc_test_obs = c(1:9,10,10,10,10)
+# bc_train_true = c(3:11,15,15,15,15)
+# bc_test_corrected = bias_correction(bc_train_obs, bc_train_true, bc_test_obs)
 
 bias_correction <- function(train.obs, train.true, test.obs, method = 'empirical_quantile')
 {
   require(tidyverse)
-  stopifnot(is.numeric(obs.data), is.numeric(true.data), length(obs.data) == length(true.data) )
+  stopifnot(is.numeric(train.obs), is.numeric(train.true), length(train.obs) == length(train.true) )
   stopifnot(is.character(method), method %in% c('linear_scaling', 'empirical_quantile') )
 
   # # for test
-  # obs.data = bc_wow_test
-  # true.data = bc_knmi_test
+  # train.obs = bc_wow_test
+  # train.true = bc_knmi_test
   # method = 'empirical_quantile'
 
-  noNA_label = !is.na(obs.data) & !is.na(true.data)
-  obs_data = obs.data[noNA_label]
-  true_data = true.data[noNA_label]
+  noNA_label = !is.na(train.obs) & !is.na(train.true)
+  obs_data = train.obs[noNA_label]
+  true_data = train.true[noNA_label]
 
   if (method == "linear_scaling")
   {
@@ -54,6 +57,6 @@ bias_correction <- function(train.obs, train.true, test.obs, method = 'empirical
   }
 
   test.obs.corrected = bc.function(test.obs)
-
+  test.obs.corrected = as.numeric(test.obs.corrected)
   return(test.obs.corrected)
 }

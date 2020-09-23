@@ -44,9 +44,3 @@ Generating a new sequence of flags, where a `P` means that observation passes th
 and a pre-defined flag name `fail.flag` means that observation fails the persistence check;
 Also outputting a new sequence of observations after removing failed observations.
 }
-\examples{
-wow_test_persist_check = temporal_persist_check(wow_test_each[[1]],
-data.column = 'windspeed_metrepersecond', datetime.column = 'datetime',
-persist.duration = 3600, min.variation = 0.1, fail.flag = 'TS2')
-attributes(wow_test_persist_check)
-}

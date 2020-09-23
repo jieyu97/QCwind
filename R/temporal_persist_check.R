@@ -22,10 +22,16 @@
 #' the observation data after removing failed observations.
 #' @export
 #' @examples
-#' wow_test_persist_check = temporal_persist_check(wow_test_each[[1]],
-#' data.column = 'windspeed_metrepersecond', datetime.column = 'datetime',
-#' persist.duration = 3600, min.variation = 0.1, fail.flag = 'TS2')
-#' attributes(wow_test_persist_check)
+# library(tidyverse)
+# datetime = as.POSIXlt(seq(0,60000,600), origin = "2017-02-03 08:00:00")
+# test = tibble(datetime = datetime,
+#               windspeed = c(rep(10.2,5),seq(10,15,0.1),rep(9.3,45)))
+# test_persist_check = temporal_persist_check(test, data.column = 'windspeed',
+#                                             datetime.column = 'datetime',
+#                                             persist.duration = 3600,
+#                                             min.variation = 0.1, fail.flag = 'TS2')
+# attributes(test_persist_check)
+# test_persist_check
 
 temporal_persist_check <- function(data, data.column, datetime.column,
                                 persist.duration, min.variation, fail.flag)
@@ -49,16 +55,23 @@ temporal_persist_check <- function(data, data.column, datetime.column,
   # min.variation = 0.1
   # fail.flag = 'TS2'
 
-  data = as.data.frame(data)
+  data = as_tibble(data)
   obs.data = data[[data.column]]    # data[,data.column]
   obs.datetime = data[[datetime.column]]    # data[,datetime.column]
   attr(obs.datetime, 'tzone') = "GMT"
+  data = data[order(data[[datetime.column]]),]
 
   time_series = xts(x = obs.data, order.by = obs.datetime)
   persist_dt_seq = tibble('start' = obs.datetime - persist.duration, 'end' = obs.datetime)
   persist_dt_seq = persist_dt_seq[order(persist_dt_seq$start),]
   persist_dt_label = str_c(persist_dt_seq$start,'/',persist_dt_seq$end)
 
+  # variation.data = lapply(persist_dt_label, FUN = function(x){
+  #   ts_interval = time_series[x]
+  #   diff.value = ifelse(length(!is.na(ts_interval)) > 1,
+  #                       max(ts_interval, na.rm = TRUE) - min(ts_interval, na.rm = TRUE), NA)
+  #   return(diff.value)
+  # })
   variation.data = unlist( lapply(persist_dt_label, FUN = function(x){
     ts_interval = time_series[x]
     diff.value = ifelse(length(!is.na(ts_interval)) > 1,
@@ -66,15 +79,16 @@ temporal_persist_check <- function(data, data.column, datetime.column,
     return(diff.value)
   }) )
 
-  output_data = data[order(data[[datetime.column]]),] %>%
-    mutate(flag = if_else( variation.data <= min.variation,
+  output_data = data %>%
+    mutate(flag_persist = if_else( variation.data <= min.variation,
                           fail.flag, 'P', 'isolated') ) %>%
-    mutate(new_data = ifelse( flag == fail.flag, NA, coredata(time_series) ) )
+    mutate(new_data_persist = ifelse( flag_persist == fail.flag, NA, coredata(time_series) ) )
 
-  output_data = as_tibble(output_data)
+  # output_data = as_tibble(output_data)
 
-  attr(output_data, 'input_missing_value_percentage') = sum(!is.na(obs.data)) / length(obs.data)
-  attr(output_data, 'pass_percentage') = sum(!is.na(output_data[['new_data']])) / sum(!is.na(obs.data))
+  attr(output_data, 'input_valid_data_percentage') = sum(!is.na(obs.data)) / length(obs.data)
+  attr(output_data, 'pass_percentage') = sum(!is.na(output_data[['new_data_persist']])) /
+    sum(!is.na(obs.data))
 
   return(output_data)
 }

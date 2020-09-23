@@ -16,10 +16,10 @@ This is the tutorial for implementing quality control procedure using the R pack
 
 In this tutorial, we focus on the wind speed observations by some citizen weather stations (CWS). The data is provided by Weather Observation Website (WOW-NL, \url{https://wow.knmi.nl/}), and we focus on the 39 CWS located in the province of Utrecht of the Netherlands.  
 
-```{r setup, message=FALSE, include=FALSE}
-library(QCwind)
+```{r start, message=FALSE, include=FALSE}
+# library(QCwind)
 library(plotly)
-load() # load date from this package
+# load() # load date from this package
 ```
 
 Firstly, let's have a look at the data structure:

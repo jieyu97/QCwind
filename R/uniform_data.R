@@ -20,10 +20,17 @@
 #' @return a new matched time series, with standard reporting time every `interval` minutes.
 #' @export
 #' @examples
-#' wow_standard_ts = uniform_data(data = wow_test_each[[1]],
-#' data.column = 'windspeed_metrepersecond', datetime.column = 'datetime',
-#' timeseq = datetime_seq_test, method = "average")
-#' str(wow_standard_ts)
+# library(tidyverse)
+# datetime = as.POSIXlt(seq(0,30000,300), origin = "2017-02-03 08:00:00")
+# datetime_seq_standard = as.POSIXlt(seq(0,30000,600), origin = "2017-02-03 08:00:00")
+# test = tibble(datetime = datetime,
+#               windspeed = c(rep(10.2,5),seq(10,15,0.1),rep(9.3,45)))
+# standard_ts = uniform_data(data = test, data.column = 'windspeed',
+#                            datetime.column = 'datetime',
+#                            timeseq = datetime_seq_standard,
+#                            method = "average")
+# str(standard_ts)
+# head(standard_ts)
 
 uniform_data = function(data, data.column, datetime.column,
                         timeseq, freq = 600, method = "average")

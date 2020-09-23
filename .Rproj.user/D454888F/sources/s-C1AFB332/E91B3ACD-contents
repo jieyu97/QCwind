@@ -1,0 +1,39 @@
+---
+title: "Tutorial for R package QCwind"
+author: "Jieyu Chen"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Quality control procedure for citizen science wind observations using R package "QCwind"}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This is the tutorial for implementing quality control procedure using the R package "QCwind". The quality control procedure is thoroughly introduced and discussed in the master thesis (\url{https://dspace.library.uu.nl/handle/1874/398742}) (or paper, cite), together with the R package "QCwind" that is built based on the procedure.  
+
+In this tutorial, we focus on the wind speed observations by some citizen weather stations (CWS). The data is provided by Weather Observation Website (WOW-NL, \url{https://wow.knmi.nl/}), and we focus on the 39 CWS located in the province of Utrecht of the Netherlands.  
+
+```{r setup, message=FALSE, include=FALSE}
+# library(QCwind)
+library(plotly)
+# load() # load date from this package
+```
+
+Firstly, let's have a look at the data structure:
+
+
+
+
+
+
+
+
+
+
+
+
+
+

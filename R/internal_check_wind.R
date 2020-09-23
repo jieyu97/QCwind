@@ -15,9 +15,15 @@
 #' `new_windgust` represents the wind gust observations after removing failed observations.
 #' @export
 #' @examples
-#' wow_test_internal_check = internal_check_wind(wow_test, speed.column = 'windspeed_metrepersecond',
-#' gust.column = 'windgust_metrepersecond', fail.flag = 'IN')
-#' attributes(wow_test_internal_check)
+# library(tidyverse)
+# datetime = as.POSIXlt(seq(0,60000,600), origin = "2017-02-03 08:00:00")
+# test = tibble(datetime = datetime,
+#               windspeed = c(0:20,20:1,1:20,20:1,1:20),
+#               windgust = c(1:50,50:0))
+# test_internal_check = internal_check_wind(test, speed.column = 'windspeed',
+#                                           gust.column = 'windgust', fail.flag = 'IN')
+# attributes(test_internal_check)
+# test_internal_check
 
 internal_check_wind <- function(data, speed.column, gust.column, fail.flag)
 {
@@ -37,13 +43,13 @@ internal_check_wind <- function(data, speed.column, gust.column, fail.flag)
   speed.data = data[[speed.column]]    # data[,speed.column]
   gust.data = data[[gust.column]]    # data[,gust.column]
   output_data = data %>%
-    mutate(flag = if_else( speed.data <= gust.data, 'P', fail.flag, 'missing') ) %>%
+    mutate(flag_internal = if_else( speed.data <= gust.data, 'P', fail.flag, 'missing') ) %>%
     mutate(new_windspeed = ifelse( speed.data <= gust.data, speed.data, NA) ) %>%
     mutate(new_windgust = ifelse( speed.data <= gust.data, gust.data, NA) )
 
   output_data = as_tibble(output_data)
 
-  attr(output_data, 'input_missing_value_percentage') = sum( !is.na(speed.data) &
+  attr(output_data, 'input_valid_data_percentage') = sum( !is.na(speed.data) &
                                                                !is.na(gust.data) ) / length(speed.data)
   attr(output_data, 'pass_percentage') = sum(!is.na(output_data[['new_windspeed']])) /
     sum( !is.na(speed.data) & !is.na(gust.data) )

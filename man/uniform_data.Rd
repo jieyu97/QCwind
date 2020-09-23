@@ -42,9 +42,3 @@ a new matched time series, with standard reporting time every `interval` minutes
 Citizen weather observations do not have uniform standards, this function converts the time series of
 observations by various citizen weather stations into the same unified form.
 }
-\examples{
-wow_standard_ts = uniform_data(data = wow_test_each[[1]],
-data.column = 'windspeed_metrepersecond', datetime.column = 'datetime',
-timeseq = datetime_seq_test, method = "average")
-str(wow_standard_ts)
-}

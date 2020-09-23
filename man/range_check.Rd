@@ -31,8 +31,3 @@ Generating a new sequence of flags, where a `P` means that observation passes th
 and a pre-defined flag name `fail.flag` means that observation fails the range check;
 Also outputting a new sequence of observations after removing failed observations.
 }
-\examples{
-wow_test_range_check = range_check(wow_test, 'windspeed_metrepersecond',
-upper.bound = 25, fail.flag = 'RS')
-attributes(wow_test_range_check)
-}

@@ -43,9 +43,3 @@ Generating a new sequence of flags, where a `P` means that observation passes th
 and a pre-defined flag name `fail.flag` means that observation fails the step check;
 Also outputting a new sequence of observations after removing failed observations.
 }
-\examples{
-wow_test_step_check = temporal_step_check(wow_test_each[[1]],
-data.column = 'windspeed_metrepersecond', datetime.column = 'datetime',
-step.duration = 720, max.variation = 5, fail.flag = 'TS1')
-attributes(wow_test_step_check)
-}

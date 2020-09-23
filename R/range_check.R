@@ -17,9 +17,13 @@
 #' the observation data after removing failed observations.
 #' @export
 #' @examples
-#' wow_test_range_check = range_check(wow_test, 'windspeed_metrepersecond',
-#' upper.bound = 25, fail.flag = 'RS')
-#' attributes(wow_test_range_check)
+# library(tidyverse)
+# datetime = as.POSIXlt(seq(0,60000,600), origin = "2017-02-03 08:00:00")
+# test = tibble(datetime = datetime,
+#               windspeed = c(0:20,20:1,1:20,20:1,1:20))
+# test_range_check = range_check(test, column = 'windspeed', upper.bound = 18, fail.flag = 'RS')
+# attributes(test_range_check)
+# test_range_check
 
 range_check <- function(data, column, upper.bound, lower.bound = 0, fail.flag)
 {
@@ -39,13 +43,14 @@ range_check <- function(data, column, upper.bound, lower.bound = 0, fail.flag)
   data = as.data.frame(data)
   obs.data = data[[column]]    # obs.data = data[,column]
   output_data = data %>%
-    mutate(flag = if_else( (obs.data <= upper.bound & obs.data >= lower.bound), 'P', fail.flag, 'missing') ) %>%
-    mutate(new_data = ifelse( (obs.data <= upper.bound & obs.data >= lower.bound), obs.data, NA) )
+    mutate(flag_range = if_else( (obs.data <= upper.bound & obs.data >= lower.bound), 'P', fail.flag, 'missing') ) %>%
+    mutate(new_data_range = ifelse( (obs.data <= upper.bound & obs.data >= lower.bound), obs.data, NA) )
 
   output_data = as_tibble(output_data)
 
-  attr(output_data, 'input_missing_value_percentage') = sum(!is.na(obs.data)) / length(obs.data)
-  attr(output_data, 'pass_percentage') = sum(!is.na(output_data[['new_data']])) / sum(!is.na(output_data[[column]]))
+  attr(output_data, 'input_valid_data_percentage') = sum(!is.na(obs.data)) / length(obs.data)
+  attr(output_data, 'pass_percentage') = sum(!is.na(output_data[['new_data_range']])) /
+    sum(!is.na(output_data[[column]]))
 
   return(output_data)
 }

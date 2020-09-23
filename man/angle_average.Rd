@@ -16,5 +16,7 @@ a number, the mean degree from the input `data`.
 Calculating the circular average from a set of angle degrees.
 }
 \examples{
+# calculate the average angle of the three: 350, 5, 20
 deg.ave = angle_average(data = c(350, 5, 20))
+deg.ave
 }
