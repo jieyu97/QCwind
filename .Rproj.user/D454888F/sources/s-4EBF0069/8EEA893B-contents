@@ -106,7 +106,7 @@ ggplot() +
              aes(datetime, windspeed_metrepersecond), color = 'darkred', alpha = 0.4)
 
 ### get filtered nonzero after persistence test
-n = 19
+n = 19 # de bilt
 wow_test = persist_wow39[[n]]
 attributes(wow_test)
 flags = which(wow_test$flag == 'TS2')
@@ -124,6 +124,20 @@ wow_standardQC_uniform = uniform_data(data = wow_standardQC,
                                       datetime.column = 'datetime',
                                       timeseq = datetime_sequence,
                                       method = "average")
+head(wow_standardQC_uniform)
+debilt = new_knmi_ws[,3]
+wow_withzero = coredata(wow_standardQC_uniform)
+nonzero_label = which(wow_withzero != 0)
+
+bc_test_corrected = bias_correction(wow_withzero, debilt, wow_withzero[nonzero_label])
+
+ggplot() + geom_histogram(aes(wow_standardQC$windspeed_metrepersecond), binwidth = 0.1)
+ggplot() + geom_histogram(aes(wow_withzero), binwidth = 0.1)
+ggplot() + geom_histogram(aes(bc_test_corrected), binwidth = 0.1)
+
+ggplot() + geom_histogram(aes(wow_withzero), binwidth = 0.2) +
+  geom_histogram(aes(bc_test_corrected), fill = 'darkred', binwidth = 0.2) +
+  labs(title = 'grey: WOW before BC, red: WOW after BC without zeros, binwidth=0.2')
 
 
 

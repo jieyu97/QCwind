@@ -1,0 +1,56 @@
+---
+title: "bias correction test"
+author: "Jieyu Chen"
+date: "2020/9/23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = FALSE,
+	message = TRUE,
+	warning = TRUE
+)
+```
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(lubridate)
+library(QCwind)
+load('/usr/people/chen/Documents/zero_speed_check.RData')
+```
+
+
+
+```{r fig.width=10, warning=FALSE}
+n = 19 # de bilt
+print(n)
+wow_test = persist_wow39[[n]]
+flags = which(wow_test$flag == 'TS2')
+flags_zero = which(wow_test$flag == 'TS2' & wow_test$windspeed_metrepersecond == 0)
+flags_others = which(wow_test$flag == 'TS2' & wow_test$windspeed_metrepersecond != 0)
+noflags = which(wow_test$flag != 'TS2')
+
+wow_standardQC = wow_test[union(flags_zero,noflags),] %>%
+  select(datetime, windspeed_metrepersecond)
+wow_standardQC = wow_standardQC[order(wow_standardQC$datetime),]
+
+wow_standardQC_uniform = uniform_data(data = wow_standardQC,
+                                      data.column = 'windspeed_metrepersecond',
+                                      datetime.column = 'datetime',
+                                      timeseq = datetime_sequence,
+                                      method = "average")
+
+wow_withzero = coredata(wow_standardQC_uniform)
+nonzero_label = which(wow_withzero != 0)
+
+bc_test_corrected = bias_correction(wow_withzero, debilt, wow_withzero[nonzero_label])
+
+print(
+  ggplot() + geom_histogram(aes(wow_withzero), binwidth = 0.2) +
+  geom_histogram(aes(bc_test_corrected), fill = 'darkred', binwidth = 0.2) +
+  labs(title = 'grey: WOW before BC, red: WOW after BC without zeros, binwidth=0.2')
+)
+
+```
+
