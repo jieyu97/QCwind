@@ -1,3 +1,0 @@
-# change language settings in R:
-Sys.getlocale()
-Sys.setlocale(category = "LC_ALL", locale = "english")
