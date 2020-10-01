@@ -1,0 +1,34 @@
+
+library(tidyverse)
+library(lubridate)
+library(QCwind)
+load("E:/bc_persist_zeros.RData")
+
+knmi_test_2016 = read_csv("E:/KIS_wind_20160101-10.csv")
+knmi_info_2016 = knmi_test %>% group_by(DS_CODE) %>%
+  summarise(obs = n())
+
+knmi_test_2018 = read_csv("E:/knmi_all_2018.csv")
+knmi_info_2018 = knmi_test %>% group_by(DS_CODE) %>%
+  summarise(obs = n())
+
+knmi_test_2019 = read_csv("E:/knmi_all_2019.csv")
+knmi_info_2019 = knmi_test %>% group_by(DS_CODE) %>%
+  summarise(obs = n())
+
+knmi_station_information
+
+location2016 = knmi_info_2016$DS_CODE
+location2018 = knmi_info_2018$DS_CODE
+location2019 = knmi_info_2019$DS_CODE
+locations = knmi_station_information$LOCATION
+
+location2016 == location2018
+location2016 == location2019
+
+location_intersect = intersect(location2016,locations)
+loc2016 = setdiff(location2016,locations)
+locold = setdiff(locations,location2016)
+
+aa = knmi_test_2018$FF_SENSOR_10[which(knmi_test_2018$DS_CODE == loc2016)]
+sum(!is.na(aa))

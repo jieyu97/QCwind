@@ -1,0 +1,60 @@
+---
+title: "WOW zero-inflated wind speed"
+author: "Jieyu Chen"
+date: "9/17/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = FALSE,
+	message = TRUE,
+	warning = TRUE
+)
+```
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(lubridate)
+library(gridExtra)
+load('/usr/people/chen/Documents/zero_speed_check.RData')
+```
+
+## Analyse the mechanism behind WOW zero-inflated wind speed  
+
+### Option 1: WOW wind sensors record low wind speeds as zero
+
+Check the distribution of WOW zero wind speeds versus KNMI low wind speeds ($\leq$ 3 m/s):  
+
+1. Compare quantities of zero wind speed records:  
+  - by hour: more zeros during the nights than days;  
+  - by day: no obvious trends;  
+  - by month: more zeros in summer than winter;  
+  - by year: no obvious trends;  
+  - by date: behaving periodic every year.  
+
+2. Analyse wind direction records when wind speeds are zero/low:  
+  - WOW directions distribution during zero wind speeds should behave "similar" to overall wind directions distribution;  
+  (Generally, in the Netherlands, more records in [190,260] overall, while more records in [110,190] during low wind speed. - summarised from De Bilt, Cabauw, and Eindhoven station.)  
+  - The directions distribution should not have large differences in one direction.  
+  
+3. Look at wind gust records when wind speeds are zero/low:  
+  - Wind gust records should be low or nearly zero.  
+
+
+
+### Option 2: WOW wind sensors have obstructions from a certain direction
+
+Analyse wind direction records when wind speeds are zero/low:  
+  - The directions distribution have some large differences in a certain direction, compared to KNMI's.  
+  
+
+
+### Option 3: WOW wind sensors get stucked during heavy wind events
+
+Look at wind gust records when wind speeds are zero/low:  
+  - Wind gust records can achieve large values.  
+
+
+
+

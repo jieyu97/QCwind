@@ -1,0 +1,24 @@
+{
+    "id": "B7294C0B",
+    "path": "E:/github/QCwind/R/hello.R",
+    "project_path": "R/hello.R",
+    "type": "r_source",
+    "hash": "787381915",
+    "contents": "",
+    "dirty": false,
+    "created": 1600855541372.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "cursorPosition": "38,1",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1600858985,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1600858985667,
+    "read_only": false,
+    "read_only_alternatives": []
+}

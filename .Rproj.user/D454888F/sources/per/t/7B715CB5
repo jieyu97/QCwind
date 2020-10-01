@@ -1,0 +1,32 @@
+{
+    "id": "7B715CB5",
+    "path": null,
+    "project_path": null,
+    "type": "r_dataframe",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1601389779860.0,
+    "source_on_save": false,
+    "relative_order": 9,
+    "properties": {
+        "expression": "knmi_station_information",
+        "caption": "knmi_station_information",
+        "totalObservations": 130,
+        "displayedObservations": 130,
+        "variables": 6,
+        "cacheKey": "EB7BA177",
+        "object": "knmi_station_information",
+        "environment": "",
+        "contentUrl": "grid_resource/gridviewer.html?env=&obj=knmi_station_information&cache_key=EB7BA177&max_cols=50",
+        "preview": 0
+    },
+    "folds": "",
+    "lastKnownWriteTime": 955410871632601120,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1601389779860,
+    "read_only": false,
+    "read_only_alternatives": []
+}

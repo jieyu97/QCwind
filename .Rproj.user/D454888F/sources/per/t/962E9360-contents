@@ -1,0 +1,116 @@
+---
+title: "zero wind speed check"
+author: "Jieyu Chen"
+date: "9/23/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = FALSE,
+	message = TRUE,
+	warning = TRUE
+)
+```
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(lubridate)
+library(gridExtra)
+load('/usr/people/chen/Documents/zero_speed_check.RData')
+```
+
+### table of percentages
+
+```{r table, echo=FALSE}
+percent %>% print(n = nrow(.))
+```
+
+### Temporal persistence check
+
+```{r fig.width=10, warning=FALSE}
+for (n in c(33,48,41,36,19,4,18,13)) {
+  print(n)
+  test_wow = used_station_data_each[[n]]
+  zero_speed = which(test_wow$windspeed_metrepersecond == 0)
+  zero_ws_time = test_wow$datetime[zero_speed]
+  zero_ws_time_info = tibble(datetime = zero_ws_time,
+                             date = date(zero_ws_time),
+                             day = day(zero_ws_time),
+                             month = month(zero_ws_time),
+                             year = year(zero_ws_time),
+                             hour = hour(zero_ws_time) )
+
+  dt = ggplot(zero_ws_time_info) +
+    geom_histogram(aes(datetime), bins = 36, color = 'royalblue', fill = 'steelblue', alpha = 0.75) +
+    labs(title = 'Zero wind speed records in different dates')
+  print(dt)
+  
+wow_test = persist_wow39[[n]]
+flags = which(wow_test$flag == 'TS2')
+flags_zero = which(wow_test$flag == 'TS2' & wow_test$windspeed_metrepersecond == 0)
+flags_others = which(wow_test$flag == 'TS2' & wow_test$windspeed_metrepersecond != 0)
+
+aa = ggplot() +
+  geom_point(data = wow_test,
+             aes(datetime, windspeed_metrepersecond), color = 'grey') +
+  geom_point(data = wow_test[flags_others,],
+             aes(datetime, windspeed_metrepersecond), color = 'steelblue', alpha = 0.6) +
+  geom_point(data = wow_test[flags_zero,],
+             aes(datetime, windspeed_metrepersecond), color = 'darkred', alpha = 0.4) +
+  ylim(c(0,10)) + labs(title = 'blue: nonzero & failed; red: zero & failed')
+print(aa)
+
+histo = ggplot() +
+  geom_histogram(data = wow_test, aes(windspeed_metrepersecond), alpha = 0.6, binwidth = 0.1) +
+  geom_histogram(data = wow_test, aes(new_data), fill = 'forestgreen', binwidth = 0.1) +
+  labs(title = 'binwidth = 0.1')
+print(histo)
+
+}
+```
+
+### Additional information
+
+```{r wow, fig.width=10, warning=FALSE}
+for (n in c(33,48,41,36,19,4,18,13)) {
+  print(n)
+  test_wow = used_station_data_each[[n]]
+  zero_speed = which(test_wow$windspeed_metrepersecond == 0)
+  zero_ws_time = test_wow$datetime[zero_speed]
+  
+  zero_ws_time_info = tibble(datetime = zero_ws_time,
+                             date = date(zero_ws_time),
+                             day = day(zero_ws_time),
+                             month = month(zero_ws_time),
+                             year = year(zero_ws_time),
+                             hour = hour(zero_ws_time) )
+  
+  hour = ggplot(zero_ws_time_info) +
+    geom_histogram(aes(hour), binwidth = 1, color = 'royalblue', fill = 'steelblue', alpha = 0.75) +
+    scale_x_continuous(breaks = 0:23) + labs(title = 'Zero wind speed records in different hours')
+  day = ggplot(zero_ws_time_info) +
+    geom_histogram(aes(day), binwidth = 1, color = 'royalblue', fill = 'steelblue', alpha = 0.75) +
+    scale_x_continuous(breaks = 1:31) + labs(title = 'Zero wind speed records in different days of a month')
+  month = ggplot(zero_ws_time_info) +
+    geom_histogram(aes(month), binwidth = 1, color = 'royalblue', fill = 'steelblue', alpha = 0.75) +
+    scale_x_continuous(breaks = 1:12) + labs(title = 'Zero wind speed records in different months of a year')
+  year = ggplot(zero_ws_time_info) +
+    geom_histogram(aes(year), binwidth = 1, color = 'royalblue', fill = 'steelblue', alpha = 0.75) +
+    labs(title = 'Zero wind speed records in different years')
+  grid.arrange(hour, month, ncol = 2)
+  grid.arrange(day, year, ncol = 2)
+  
+  # dt = ggplot(zero_ws_time_info) +
+  #   geom_histogram(aes(datetime), bins = 36, color = 'royalblue', fill = 'steelblue', alpha = 0.75) +
+  #   labs(title = 'Zero wind speed records in different dates')
+  # print(dt)
+  
+  zero_ws_date = zero_ws_time_info %>% group_by(date) %>% summarise(number = n())
+  date = ggplot(zero_ws_date, aes(x = date, y = number)) +
+    geom_line(color = 'steelblue', alpha = 0.9) +
+    labs(title = 'Number of zero wind speed records in different dates')
+  print(date)
+}
+```
+
