@@ -5,7 +5,7 @@
 #' @param train.obs a numeric vector of training observed data to build the bias correction model.
 #' @param train.true a numeric vector of training true data to build the bias correction model.
 #' @param test.obs a numeric vector of test observed data to be calibrated.
-#' @param method a character indicating the choosen bias correction method;
+#' @param method a character indicating the chosen bias correction method;
 #' `linear_scaling`: the linear scaling method, fitting the relationship between observed and
 #' true data by a linear model;
 #' `empirical_quantile`: the empirical quantile mapping method, mapping the quantiles between
@@ -23,11 +23,6 @@ bias_correction <- function(train.obs, train.true, test.obs, method = 'empirical
   require(tidyverse)
   stopifnot(is.numeric(train.obs), is.numeric(train.true), length(train.obs) == length(train.true) )
   stopifnot(is.character(method), method %in% c('linear_scaling', 'empirical_quantile') )
-
-  # # for test
-  # train.obs = bc_wow_test
-  # train.true = bc_knmi_test
-  # method = 'empirical_quantile'
 
   noNA_label = !is.na(train.obs) & !is.na(train.true)
   obs_data = train.obs[noNA_label]

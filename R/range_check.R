@@ -21,27 +21,20 @@
 #' datetime = as.POSIXlt(seq(0,60000,600), origin = "2017-02-03 08:00:00")
 #' test = tibble(datetime = datetime,
 #'               windspeed = c(0:20,20:1,1:20,20:1,1:20))
-#' test_range_check = range_check(test, column = 'windspeed', upper.bound = 18, fail.flag = 'RS')
+#' test_range_check = range_check(test, column = 'windspeed', upper.bound = 18, fail.flag = 'fail.range')
 #' attributes(test_range_check)
 #' test_range_check
 
-range_check <- function(data, column, upper.bound, lower.bound = 0, fail.flag)
+range_check <- function(data, data.column, upper.bound, lower.bound = 0, fail.flag)
 {
   require(tidyverse)
   stopifnot(upper.bound > lower.bound)
   stopifnot(is.character(fail.flag))
   stopifnot(is.data.frame(data))
-  stopifnot(is.character(column), column %in% colnames(data))
-
-  # # for test
-  # data = wow_test
-  # column = 'windspeed_metrepersecond'
-  # upper.bound = 25
-  # lower.bound = 0
-  # fail.flag = 'RS'
+  stopifnot(is.character(data.column), data.column %in% colnames(data))
 
   data = as.data.frame(data)
-  obs.data = data[[column]]    # obs.data = data[,column]
+  obs.data = data[[data.column]]    # obs.data = data[,data.column]
   output_data = data %>%
     mutate(flag_range = if_else( (obs.data <= upper.bound & obs.data >= lower.bound), 'P', fail.flag, 'missing') ) %>%
     mutate(new_data_range = ifelse( (obs.data <= upper.bound & obs.data >= lower.bound), obs.data, NA) )
@@ -50,7 +43,7 @@ range_check <- function(data, column, upper.bound, lower.bound = 0, fail.flag)
 
   attr(output_data, 'input_valid_data_percentage') = sum(!is.na(obs.data)) / length(obs.data)
   attr(output_data, 'pass_percentage') = sum(!is.na(output_data[['new_data_range']])) /
-    sum(!is.na(output_data[[column]]))
+    sum(!is.na(output_data[[data.column]]))
 
   return(output_data)
 }

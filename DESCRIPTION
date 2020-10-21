@@ -12,6 +12,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Depends: R (>= 3.5.0), 
   base, stats, tidyverse, lubridate, xts, RColorBrewer
-Imports: base, stats, tidyverse, lubridate, xts, RColorBrewer
+Imports: base, stats, tidyverse, lubridate, xts, RColorBrewer, gstat, sp, automap
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
