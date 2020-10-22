@@ -3,5 +3,184 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## ----start, message=FALSE, include=FALSE--------------------------------------
 # library(QCwind)
-# load() # load date from this package
+### data - example
+# x <- sample(1000)
+# usethis::use_data(x, mtcars)
+# library(mtcars)
+# Documenting datasets
+
+## ----eval=F, echo=T-----------------------------------------------------------
+#  # data: wow_raw_noNA_data.RData - used_station_data_each, wow_station_information_used
+#  
+#  valid_percent = function(dataframe) {
+#    # calculate the valid data percentage of each station, given that NA wind speed observations are already removed with the whole lines.
+#    require(lubridate)
+#    valid.days = length( unique( lubridate::date(dataframe$datetime) ) )
+#    whole.3y.days = 366 + 365 + 365
+#    valid.percent = valid.days / whole.3y.days * 100
+#    return(valid.percent)
+#  }
+#  
+#  station.valid_percent = rep(NA,67)
+#  for (w in 1:length(used_station_data_each)) {
+#    station.valid_percent[w] = valid_percent(used_station_data_each[[w]])
+#  }
+#  station.enough_data.label = setdiff( which(station.valid_percent >= 35), c(24,25) ) # remove 24,25 (knmi stations debilt and cabauw).
+
+## ----eval=F, echo=T-----------------------------------------------------------
+#  # data: output of above
+#  
+#  repeat_percent = function(dataframe) {
+#    all.values = table(dataframe$windspeed_metrepersecond)
+#    repeat.percent = max(all.values) / length(dataframe$windspeed_metrepersecond) * 100
+#    return(repeat.percent)
+#  }
+#  
+#  station.repeat_percent = rep(NA,67)
+#  for (w in 1:length(used_station_data_each)) {
+#    station.repeat_percent[w] = repeat_percent(used_station_data_each[[w]])
+#  }
+#  station.enough_data.label = intersect( which(station.repeat_percent < 90), station.enough_data.label )
+
+## ----eval=F, echo=T-----------------------------------------------------------
+#  # data: output of above
+#  final_label = station.enough_data.label
+#  wow_information = wow_station_information_used[final_label,]
+#  wow_wind_data = used_station_data_each[final_label]
+#  
+#  # only keep wind speed data
+#  library(tidyverse)
+#  wow_windspeed_each = c()
+#  for (w in 1:length(wow_wind_data)) {
+#    wow_windspeed_each[[w]] = wow_wind_data[[w]] %>%
+#      dplyr::select(station_id = station_id, datetime = datetime, windspeed = windspeed_metrepersecond)
+#  }
+#  # save new data in wow.after_preprocess.RData
+
+## ----eval=F, echo=T-----------------------------------------------------------
+#  # data: wow.after_preprocess.RData (KNMI reference wind speed data added)
+#  library(QCwind)
+#  library(xts)
+#  library(zoo)
+#  library(lubridate)
+#  w = 11
+#  
+#  wow_windspeed.after_standardQC = c()
+#  wow_windspeed.uniform_beforeBC = c()
+#  
+#  for (w in 1:39) {
+#  
+#  wow_single = wow_windspeed_each[[w]]
+#  # 1. range check
+#  wow_single_range = range_check(wow_single, data.column = 'windspeed', datetime.column = 'datetime',
+#                                 upper.bound = c(33.4,29.8,29.8,29.8,26.2,23.1,25.0,26.8,35.0,31.0,30.9,32.4))
+#  attributes(wow_single_range)
+#  
+#  # 2. step check
+#  Sys.time() # 2min per station
+#  wow_single_step = temporal_step_check.improve(wow_single_range, data.column = 'windspeed', datetime.column = 'datetime',
+#                      step.duration = 660, max.variation = 15.51)
+#  Sys.time()
+#  attributes(wow_single_step)
+#  
+#  # 3. persist check
+#  Sys.time() # 3min per station
+#  wow_single_persist = temporal_persist_check(wow_single_step, data.column = 'windspeed', datetime.column = 'datetime',
+#                         persist.duration = 16*600, min.variation = 0.05)
+#  Sys.time()
+#  attributes(wow_single_persist)
+#  
+#  wow_windspeed.after_standardQC[[w]] = wow_single_persist
+#  
+#  ### transfer to the uniform time series with 10-min timestamp resolution.
+#  print(Sys.time()) #4min
+#  zero_before = which(wow_single_persist$windspeed == 0)
+#  nonzero_after = which(wow_single_persist$new_data_persist != 0)
+#  
+#  uniform.zero_before = uniform_data(data = wow_single_persist[zero_before,], data.column = 'windspeed',
+#                                     datetime.column = 'datetime',
+#                                     timeseq = datetime_sequence)
+#  uniform.nonzero_after = uniform_data(data = wow_single_persist[nonzero_after,], data.column = 'windspeed',
+#                                       datetime.column = 'datetime',
+#                                       timeseq = datetime_sequence)
+#  
+#  replace_label = which(!is.na(coredata(uniform.nonzero_after)))
+#  uniform.zero_before[replace_label] = uniform.nonzero_after[replace_label]
+#  
+#  wow_single_uniform = tibble(station_id = wow_single_persist$station_id[1],
+#                              datetime = datetime_sequence,
+#                              windspeed_before_bc = as.numeric(coredata(uniform.zero_before)))
+#  print(Sys.time())
+#  
+#  wow_windspeed.uniform_beforeBC[[w]] = wow_single_uniform
+#  
+#  }
+#  
+#  save.image("~/Documents/wow.after_standardQC.RData")
+#  Sys.time()
+
+## ----eval=F, echo=T-----------------------------------------------------------
+#  ############### check KNMI persistence
+#  knmi_ws_var = apply(knmi_windspeed, 2, function(x){
+#    x - dplyr::lag(x)
+#  })
+#  range(abs(knmi_ws_var), na.rm = TRUE)
+#  for (k in 1:47) {
+#    # print(k)
+#    ws_label = which( abs(knmi_ws_var[,k]) > 0.01) # 0.01, 0.1, 0.05
+#    knmi_ws_var[ws_label,k] = NA
+#    # print(length(which(knmi_ws_var[,k] == 0)))
+#  }
+#  split_NA <- function( x ){
+#    idx <- 1 + cumsum( is.na( x ) )
+#    not.na <- ! is.na( x )
+#    split( x[not.na], idx[not.na] )
+#  }
+#  split_knmi_ws = apply(knmi_ws_var, 2, split_NA)
+#  
+#  test_split_knmi_official = split_knmi_ws
+#  test_split_length_knmi_official = c()
+#  for (k in 1:47) {
+#    test = test_split_knmi_official[[k]]
+#    test_l = 1:length(test)
+#    for (n in 1 : length(test) ) {
+#      test_l[n] = length(test[[n]])
+#    }
+#    test_split_length_knmi_official[[k]] = test_l
+#  }
+#  interval_lengths = unlist(test_split_length_knmi_official) # test_split_length_knmi_official[[k]]
+#  table(interval_lengths)
+#  #      1      2      3      4      5      6      7      8      9     10     11     12     13     14     15     16     18     19     22
+#  # 138311   3769    241     84     41     29     12     10      9      8      4      5      5      2      1      2      1      1      1
+#  # 24     25     26     27     32     35     37     42     43     55     58     85    119    135    136    591    830
+#  #  1      1      1      1      1      7      1      1      1      1      1      1      1      1      1      1      1
+#  # choose 16*10min as the persist duration
+#  ###############################
+
+## ----eval=F, echo=T-----------------------------------------------------------
+#  knmi_kriging_all = kriging_quantile_true(official.windspeed = knmi_windspeed,
+#                                           datetime.sequence = datetime_sequence,
+#                                           official.longitude = knmi_information$longitude,
+#                                           official.latitude = knmi_information$latitude,
+#                                           split.season = TRUE)
+#  
+#  wow_kriging_quantiles = interpolate_quantiles(kriging.reference.quantiles = knmi_kriging_all,
+#                                                station.id = wow_information$station_id,
+#                                                station.longitude = wow_information$longitude,
+#                                                station.latitude = wow_information$latitude)
+#  
+#  wow_windspeed.afterBC = list()
+#  for (w in 1:39) {
+#    print(Sys.time())
+#    wow_single_beforeBC = wow_windspeed.uniform_beforeBC[[w]]
+#    wow_single_afterBC = wow_single_beforeBC %>%
+#      mutate(new_data_bc = NA)
+#    wow_single_afterBC$new_data_bc = eqm_bias_correction(
+#      train.obs = wow_single_beforeBC$windspeed_before_bc,
+#      train.datetime = wow_single_beforeBC$datetime,
+#      test.obs = wow_single_beforeBC$windspeed_before_bc,
+#      test.datetime = wow_single_beforeBC$datetime,
+#      true.quantiles = wow_kriging_quantiles[[w]])
+#    wow_windspeed.afterBC[[w]] = wow_single_afterBC
+#  }
 

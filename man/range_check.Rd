@@ -46,7 +46,8 @@ library(tidyverse)
 datetime = as.POSIXct(seq(0,60000,600), origin = "2017-02-03 08:00:00")
 test_data = tibble(datetime = datetime,
               windspeed = c(0:20,20:1,1:20,20:1,1:20))
-test_range_check = range_check(test_data, data.column = 'windspeed', datetime.column = 'datetime', upper.bound = c(11:22))
+test_range_check = range_check(test_data, data.column = 'windspeed',
+                               datetime.column = 'datetime', upper.bound = c(11:22))
 attributes(test_range_check)
 test_range_check
 }

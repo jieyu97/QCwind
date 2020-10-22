@@ -1,17 +1,31 @@
 Package: QCwind
 Type: Package
 Title: Quality control procedures for citizen science wind observations
-Version: 0.1.0
-Author: Jieyu Chen
+Version: 0.3
+Authors@R: c(
+    person("Jieyu", "Chen", email = "Selena970703@gmail.com", role = c("aut", "cre"))
+    )
 Maintainer: The package maintainer <jieyu.chen@knmi.nl>
-Description: This package contains the functions used to do quality control and bias correction for wind data.
-License: KNMI@copyright
+Description: This package includes the functions used to perform quality control 
+            and bias correction for wind speed observation data.
+License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: yes
+LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
-Depends: R (>= 3.5.0), 
-  base, stats, tidyverse, lubridate, xts, RColorBrewer, gstat, sp, automap, fitdistrplus, rgdal
-Imports: base, stats, tidyverse, lubridate, xts, RColorBrewer, gstat, sp, automap, fitdistrplus, rgdal
+Depends: R (>= 3.5.0)
+Imports: base, 
+        stats, 
+        tidyverse, 
+        lubridate, 
+        ggplot2,
+        xts, 
+        zoo,
+        gstat, 
+        automap,
+        sp,  
+        fitdistrplus, 
+        rgdal, 
+        RColorBrewer
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr

@@ -28,7 +28,7 @@ hello <- function() {
 # devtools::check()
 # devtools::install()
 # Ctrl + Shift + D, if using RStudio
-#
+# devtools::load_all()
 # devtools::build_manual()
 # devtools::build_vignettes()
 #

@@ -3,22 +3,22 @@
     "path": "E:/github/QCwind/vignettes/tutorial.Rmd",
     "project_path": "vignettes/tutorial.Rmd",
     "type": "r_markdown",
-    "hash": "0",
+    "hash": "705889782",
     "contents": "",
     "dirty": false,
     "created": 1600855923786.0,
     "source_on_save": false,
     "relative_order": 2,
     "properties": {
-        "cursorPosition": "37,0",
-        "scrollLine": "0"
+        "cursorPosition": "243,3",
+        "scrollLine": "236"
     },
     "folds": "",
-    "lastKnownWriteTime": 1603330288,
+    "lastKnownWriteTime": 1603361626,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1603330288682,
+    "last_content_update": 1603361627000,
     "read_only": false,
     "read_only_alternatives": []
 }
