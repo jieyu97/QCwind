@@ -16,11 +16,6 @@
 #' @param test.datetime a sequence of timestamps in `test.obs`.
 #' @return a numeric vector that contains the corrected `test_after_bc` for the test data.
 #' @export
-#' @examples
-#' bc_train_obs = c(0:8,0,1,2,3,4,5,0,2,3,1,9)
-#' bc_true_quantiles = c(0.1,1,3,5,7,8,9,9.1,9.2,9.3)
-#' bc_test_obs = c(5,6,7)
-#' bc_test_corrected = bias_correction(bc_train_obs, bc_test_obs, bc_true_quantiles)
 
 eqm_bias_correction <- function(train.obs, train.datetime,
                             test.obs, test.datetime, true.quantiles)
