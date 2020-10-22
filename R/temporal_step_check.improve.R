@@ -1,7 +1,6 @@
-#' @name temporal_step_check.realtime
-#' @title Temporal step check function in realtime
+#' @name temporal_step_check.improve
+#' @title Temporal step check function (new version, can be implemented in realtime)
 #' @description Same as the description in `temporal_step_check`.
-#' For realtime step checks, there are much less data (within one day), and we can arrange the check one by one.
 #' @param data a data.frame that includes observation data with information.
 #' @param data.column a character, the selected column name in the data.frame that
 #' represents observation data to be checked.
@@ -9,10 +8,8 @@
 #' represents the reporting dates and times of corresponding observations.
 #' @param step.duration a positive number, the interval time for step test, the unit is 'second'.
 #' @param max.variation a positive number, the maximum allowed variability of observations.
-#' @param fail.flag a character/string that represents the name of flag where an
-#' observation fails the step check.
 #' @return a new tbl_df that extends two new columns on the input data,
-#' the first added column `flag_step` represents the flags (`P` means pass, `fail.flag` means fail,
+#' the first added column `flag_step` represents the flags (`P` means pass, `fail.step` means fail,
 #' `isolated` means missing previous observations), the second added column `new_data_step` represents
 #' the observation data after removing failed observations in the step check.
 #' @export
@@ -21,21 +18,20 @@
 #' datetime = as.POSIXct(seq(0,60000,600), origin = "2017-02-03 08:00:00")
 #' test_data = tibble(datetime = datetime, windspeed = c(rep(10.2,5),rep(NA,5),rep(9.3,35),rep(20,5),
 #'                                                 rep(3.5,40),c(1,3,NA,2,NA,5,6,7,NA,2,4)))
-#' test_step_check = temporal_step_check.realtime(test_data, data.column = 'windspeed',
+#' test_step_check = temporal_step_check.improve(test_data, data.column = 'windspeed',
 #'                                       datetime.column = 'datetime',
 #'                                       step.duration = 660,
-#'                                       max.variation = 5, fail.flag = 'fail.step')
+#'                                       max.variation = 5)
 #' attributes(test_step_check)
 #' test_step_check
 
-temporal_step_check.realtime <- function(data, data.column, datetime.column,
-                                step.duration, max.variation, fail.flag)
+temporal_step_check.improve <- function(data, data.column, datetime.column,
+                                step.duration, max.variation)
 {
   require(tidyverse)
   require(xts)
   stopifnot(step.duration > 0)
   stopifnot(max.variation > 0)
-  stopifnot(is.character(fail.flag))
   stopifnot(is.data.frame(data))
   stopifnot(is.character(data.column), data.column %in% colnames(data))
   stopifnot(is.character(datetime.column), datetime.column %in% colnames(data))
@@ -74,17 +70,18 @@ temporal_step_check.realtime <- function(data, data.column, datetime.column,
   label.center.fail.left = which(!is.na(lag.data) & !is.na(center.data) &
                                    variation.data > max.variation &
                                    center.data > lag.data &
-                                   lag.diff.data > max.variation) # flag - fail.flag, failed observations
+                                   lag.diff.data > max.variation) # flag - fail.step, failed observations
   label.center.fail.right = which(!is.na(lead.data) & !is.na(center.data) &
                                     variation.data > max.variation &
                                     center.data > lead.data &
-                                    lead.diff.data > max.variation)# flag - fail.flag, failed observations
+                                    lead.diff.data > max.variation)# flag - fail.step, failed observations
   
   # check data between left step failed and right step failed data;
   # to identify observations when a wind sensor is stucked and keeps report non-changeable high speed.
   label.center.fail.between.left = c()
   for (x.left in label.center.fail.left) {
-    for (i in 1:min(300, length(lag.diff.data)-x.left) ) { # set 300 because the data is limited in the most recent times
+    for (i in 1:min(300, length(lag.diff.data)-x.left) ) { 
+      # set 300 because the data to be checked is limited in the most recent times (approx 5 hours)
       if (lag.diff.data[x.left + i] < 0.1) {
         fail.between = x.left + i
       } else {
@@ -95,7 +92,8 @@ temporal_step_check.realtime <- function(data, data.column, datetime.column,
   }
   label.center.fail.between.right = c()
   for (x.right in setdiff(label.center.fail.right,1)) {
-    for (i in 1:min(300, x.right-1) ) { # set 300 because the data is limited in the most recent times
+    for (i in 1:min(300, x.right-1) ) { 
+      # set 300 because the data to be checked is limited in the most recent times (approx 5 hours)
       if (lead.diff.data[x.right - i] < 0.1) {
         fail.between = x.right - i
       } else {
@@ -105,17 +103,19 @@ temporal_step_check.realtime <- function(data, data.column, datetime.column,
     }
   }
   label.center.fail.between = union(label.center.fail.between.left, 
-                                    label.center.fail.between.right) # flag - fail.flag, failed observations
+                                    label.center.fail.between.right) # flag - fail.step, failed observations
   
   output_flag = data %>% mutate(flag_step = "P")
-  output_flag$flag_step[label.center.fail.between] = fail.flag
-  output_flag$flag_step[label.center.fail.left] = fail.flag
-  output_flag$flag_step[label.center.fail.right] = fail.flag
+  output_flag$flag_step[label.center.fail.between] = "fail.step"
+  output_flag$flag_step[label.center.fail.left] = "fail.step"
+  output_flag$flag_step[label.center.fail.right] = "fail.step"
   output_flag$flag_step[label.center.isolate] = "isolated"
   output_flag$flag_step[label.center.na] = "missing"
   
   output_data = output_flag %>%
-    mutate(new_data_step = ifelse( flag_step == fail.flag, NA, center.data ) )
+    mutate(new_data_step = ifelse( flag_step == "fail.step", NA, center.data ) )
+  
+  attr(output_data, 'step_pass_percent') = sum(!is.na(output_data$new_data_step)) / sum(!is.na(obs.data))
   
   return(output_data)
 }

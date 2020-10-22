@@ -11,3 +11,5 @@
 ^\.github$
 ^\test_data$
 ^\test_codes$
+^doc$
+^Meta$

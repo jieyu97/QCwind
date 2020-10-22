@@ -17,14 +17,25 @@ internal_check_wind(data, speed.column, gust.column, fail.flag)
 }
 \value{
 a new tbl_df that extends three new columns on the input data,
-the first added column `flag` represents the flags (`P` means pass, `fail.flag` means fail,
-`missing` means missing values of observations), the second added column `new_windspeed` represents
+the first added column \code{flag} represents the flags (\code{P} means pass, \code{fail.flag} means fail,
+\code{missing} means missing values of observations), the second added column \code{new_windspeed} represents
 the wind speed observations after removing failed observations, the third added column
-`new_windgust` represents the wind gust observations after removing failed observations.
+\code{new_windgust} represents the wind gust observations after removing failed observations.
 }
 \description{
 Checking the internal consistency of wind data, wind speed should be no larger than wind gust;
-Generating a new sequence of flags, where a `P` means that observation passes the internal check,
-and a pre-defined flag name `fail.flag` means that observation fails the internal check;
+Generating a new sequence of flags, where a \code{P} means that observation passes the internal check,
+and a pre-defined flag name \code{fail.flag} means that observation fails the internal check;
 Also outputting two new sequences of wind speed and gust observations after removing failed observations.
+}
+\examples{
+library(tidyverse)
+datetime = as.POSIXlt(seq(0,60000,600), origin = "2017-02-03 08:00:00")
+test = tibble(datetime = datetime,
+              windspeed = c(0:20,20:1,1:20,20:1,1:20),
+              windgust = c(1:50,50:0))
+test_internal_check = internal_check_wind(test, speed.column = 'windspeed',
+                                          gust.column = 'windgust', fail.flag = 'IN')
+attributes(test_internal_check)
+test_internal_check
 }

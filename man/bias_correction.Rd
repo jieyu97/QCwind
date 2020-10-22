@@ -13,16 +13,22 @@ bias_correction(train.obs, train.true, test.obs, method = "empirical_quantile")
 
 \item{test.obs}{a numeric vector of test observed data to be calibrated.}
 
-\item{method}{a character indicating the choosen bias correction method;
-`linear_scaling`: the linear scaling method, fitting the relationship between observed and
+\item{method}{a character indicating the chosen bias correction method;
+\code{linear_scaling}: the linear scaling method, fitting the relationship between observed and
 true data by a linear model;
-`empirical_quantile`: the empirical quantile mapping method, mapping the quantiles between
+\code{empirical_quantile}: the empirical quantile mapping method, mapping the quantiles between
 the empirical cumulative density functions of observed and true data.}
 }
 \value{
-a numeric vector that contains the corrected `test.obs` data.
+a numeric vector that contains the corrected \code{test.obs} data.
 }
 \description{
 Using different methods to calibrate the systematic bias between observed
 and true data.
+}
+\examples{
+bc_train_obs = c(0:8,9,9,9,9)
+bc_test_obs = c(1:9,10,10,10,10)
+bc_train_true = c(3:11,15,15,15,15)
+bc_test_corrected = bias_correction(bc_train_obs, bc_train_true, bc_test_obs)
 }

@@ -17,6 +17,9 @@
 #' "nearest": the nearest observation to `timeseq` in each time interval with length `freq`.
 #' "angle.average": the circular average value of angle observations
 #' in each time interval with length `freq`.
+#' @param position the time window considered to match the standard 10-min timestamps:
+#' "centre" means the time window is centred at the standard timestamps;
+#' "past" means the time window is the past 10-min interval of the standard timestamps.
 #' @return a new matched time series, with standard reporting time every `interval` minutes.
 #' @export
 #' @examples
@@ -33,7 +36,7 @@
 #' head(standard_ts)
 
 uniform_data = function(data, data.column, datetime.column,
-                        timeseq, freq = 600, method = "average")
+                        timeseq, freq = 600, method = "average", position = "past")
 {
   require(tidyverse)
   require(xts)
@@ -44,7 +47,9 @@ uniform_data = function(data, data.column, datetime.column,
   stopifnot(freq > 0)
   stopifnot(is.character(method),
             method %in% c("average", "maximum", "nearest", "angle.average"))
-
+  stopifnot(is.character(position),
+            position %in% c("past", "centre"))
+  
   # # for test
   # data = wow_test_each[[1]]
   # data.column = 'windspeed_metrepersecond'
@@ -58,8 +63,13 @@ uniform_data = function(data, data.column, datetime.column,
   attr(obs.datetime, 'tzone') = "GMT"
 
   time_series = xts(x = obs.data, order.by = obs.datetime)
-  standard_dt_seq = tibble('start' = timeseq - (freq/2),
-                           'end' = timeseq + (freq/2 - 1) )
+  if (position == "centre") {
+    standard_dt_seq = tibble('start' = timeseq - (freq/2),
+                             'end' = timeseq + (freq/2 - 1) )
+  } else {
+    standard_dt_seq = tibble('start' = timeseq - freq + 1,
+                             'end' = timeseq )
+  }
   standard_dt_seq = standard_dt_seq[order(standard_dt_seq$start),]
   standard_dt_label = str_c(standard_dt_seq$start,'/',standard_dt_seq$end)
 

@@ -3,9 +3,7 @@
 #' @description Check on a minimum required variability of an instantaneous value;
 #' Observations should change more than a minimum required number `min.variation`,
 #' during a time interval of length `persist.duration`;
-#' Generating a new sequence of flags, where a `P` means that observation passes the persistence check,
-#' and a pre-defined flag name `fail.flag` means that observation fails the persistence check;
-#' Also outputting a new sequence of observations after removing failed observations.
+#' Generating a new sequence of flags, and outputting a new sequence of observations after removing failed observations.
 #' @param data a data.frame that includes observation data with information.
 #' @param data.column a character, the selected column name in the data.frame that
 #' represents observation data to be checked.
@@ -14,12 +12,10 @@
 #' @param persist.duration a positive number, the interval time for persistence test,
 #' the unit is 'second'.
 #' @param min.variation a positive number, the minimum required variability of observations.
-#' @param fail.flag a character/string that represents the name of flag where an
-#' observation fails the persistence check.
 #' @param realtime a logical. `TRUE` means processing in realtime,
 #' the attributes that includes pass percent would be removed in realtime case.
 #' @return a new tbl_df that extends two new columns on the input data,
-#' the first added column `flag_persist` represents the flags (`P` means pass, `fail.flag` means fail,
+#' the first added column `flag_persist` represents the flags (`P` means pass, `fail.persist` means fail,
 #' `isolated` means missing previous observations), the second added column `new_data_persist` represents
 #' the observation data after removing failed observations.
 #' @export
@@ -32,18 +28,17 @@
 #' test_persist_check = temporal_persist_check(test_data, data.column = 'windspeed',
 #'                                             datetime.column = 'datetime',
 #'                                             persist.duration = 3600,
-#'                                             min.variation = 0.1, fail.flag = 'fail.persist')
+#'                                             min.variation = 0.1)
 #' attributes(test_persist_check)
 #' test_persist_check
 
 temporal_persist_check <- function(data, data.column, datetime.column,
-                                persist.duration, min.variation, fail.flag, realtime = FALSE)
+                                persist.duration, min.variation, realtime = FALSE)
 {
   require(tidyverse)
   require(xts)
   stopifnot(persist.duration > 0)
   stopifnot(min.variation > 0)
-  stopifnot(is.character(fail.flag))
   stopifnot(is.data.frame(data))
   stopifnot(is.character(data.column), data.column %in% colnames(data))
   stopifnot(is.character(datetime.column), datetime.column %in% colnames(data))
@@ -61,12 +56,12 @@ temporal_persist_check <- function(data, data.column, datetime.column,
   persist_dt_seq = persist_dt_seq[order(persist_dt_seq$start),]
   persist_dt_label = str_c(persist_dt_seq$start,'/',persist_dt_seq$end)
 
-  # choose a number `length(ts_interval)/2`:
+  # choose a number `persist.duration/600/2`:
   # ensure when checking the persistence of data in the time window,
   # there are at least half valid (not NA) data to consider.
   variation.data = unlist( lapply(persist_dt_label, FUN = function(x){
     ts_interval = time_series[x]
-    diff.value = ifelse(sum(!is.na(ts_interval)) > max(length(ts_interval)/2,2),
+    diff.value = ifelse(sum(!is.na(ts_interval)) > persist.duration/600/2,
                         max(ts_interval, na.rm = TRUE) - min(ts_interval, na.rm = TRUE), NA)
     return(diff.value)
   }) )
@@ -85,25 +80,29 @@ temporal_persist_check <- function(data, data.column, datetime.column,
     which(!is.na(center.data) & is.na(lag.data) & is.na(lead.data)),
     which(!is.na(center.data) & is.na(variation.data)) ),
     which(data[[datetime.column]] %in% index(ts_start)) )
-  # flag - fail.flag, failed observations
+  # flag - fail.persist, failed observations
   label.center.fail0 = which(variation.data <= min.variation)
-  label.center.fail1 = lapply(label.center.fail0, function(x) {
-    ts_short = time_series[persist_dt_label[x]]
-    ts_short_label = which(data[[datetime.column]] %in% index(ts_short))
-    return(ts_short_label)
-  })
-  label.center.fail = c()
-  for (i in 1:length(label.center.fail1)) {
-    label.center.fail = union(label.center.fail, label.center.fail1[[i]])
+  if (length(label.center.fail0) > 0) {
+    label.center.fail1 = lapply(label.center.fail0, function(x) {
+      ts_short = time_series[persist_dt_label[x]]
+      ts_short_label = which(data[[datetime.column]] %in% index(ts_short))
+      return(ts_short_label)
+    })
+    label.center.fail = c()
+    for (i in 1:length(label.center.fail1)) {
+      label.center.fail = union(label.center.fail, label.center.fail1[[i]])
+    }
+  } else {
+    label.center.fail = NA
   }
 
   output_flag = data %>% mutate(flag_persist = "P")
-  output_flag$flag_persist[label.center.fail] = fail.flag
+  output_flag$flag_persist[label.center.fail] = "fail.persist"
   output_flag$flag_persist[label.center.isolate] = "isolated"
   output_flag$flag_persist[label.center.na] = "missing"
 
   output_data = output_flag %>%
-    mutate(new_data_persist = ifelse( flag_persist == fail.flag, NA, center.data ) )
+    mutate(new_data_persist = ifelse( flag_persist == "fail.persist", NA, center.data ) )
 
   if (realtime == FALSE) {
     attr(output_data, 'input_valid_data_percentage') = sum(!is.na(obs.data)) / length(obs.data)

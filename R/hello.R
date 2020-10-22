@@ -32,14 +32,5 @@ hello <- function() {
 # devtools::build_manual()
 # devtools::build_vignettes()
 #
-# bc: quantile mapping, interpolated quantiles
-# temporal: backward and forward
-
-# errors in functions:
-#
-# temporal_persist_check & temporal_step_check - example has warnings, why
-# Warning message:
-#   In stri_c(..., sep = sep, collapse = collapse, ignore_null = TRUE) :
-#   argument is not an atomic vector; coercing
 #
 # windrose_plot - add a simple example

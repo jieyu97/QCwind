@@ -10,7 +10,8 @@ uniform_data(
   datetime.column,
   timeseq,
   freq = 600,
-  method = "average"
+  method = "average",
+  position = "past"
 )
 }
 \arguments{
@@ -23,22 +24,39 @@ represents observation data to be checked.}
 represents dates and times of observations to be checked.}
 
 \item{timeseq}{a date and time vector, indicating the standard reporting timestamps.
-`timeseq` must have the same length with `data`.}
+\code{timeseq} must have the same length with \code{data}.}
 
 \item{freq}{a number, the standard reporting interval time, the unit is "second".
 We typically use 10 (min) for forecast use, and 60 (min) for analysis use.}
 
 \item{method}{the matching method, choosing from "average", "maximum", "nearest", or "angle.average".
-"average": the average value of observations in each time interval with length `freq`.
-"maximum": the maximum value of observations in each time interval with length `freq`.
-"nearest": the nearest observation to `timeseq` in each time interval with length `freq`.
+"average": the average value of observations in each time interval with length \code{freq}.
+"maximum": the maximum value of observations in each time interval with length \code{freq}.
+"nearest": the nearest observation to \code{timeseq} in each time interval with length \code{freq}.
 "angle.average": the circular average value of angle observations
-in each time interval with length `freq`.}
+in each time interval with length \code{freq}.}
+
+\item{position}{the time window considered to match the standard 10-min timestamps:
+"centre" means the time window is centred at the standard timestamps;
+"past" means the time window is the past 10-min interval of the standard timestamps.}
 }
 \value{
-a new matched time series, with standard reporting time every `interval` minutes.
+a new matched time series, with standard reporting time every \code{interval} minutes.
 }
 \description{
 Citizen weather observations do not have uniform standards, this function converts the time series of
 observations by various citizen weather stations into the same unified form.
+}
+\examples{
+library(tidyverse)
+datetime = as.POSIXlt(seq(0,30000,300), origin = "2017-02-03 08:00:00")
+datetime_seq_standard = as.POSIXlt(seq(0,30000,600), origin = "2017-02-03 08:00:00")
+test = tibble(datetime = datetime,
+              windspeed = c(rep(10.2,5),seq(10,15,0.1),rep(9.3,45)))
+standard_ts = uniform_data(data = test, data.column = 'windspeed',
+                           datetime.column = 'datetime',
+                           timeseq = datetime_seq_standard,
+                           method = "average")
+str(standard_ts)
+head(standard_ts)
 }

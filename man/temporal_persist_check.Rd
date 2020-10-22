@@ -10,7 +10,7 @@ temporal_persist_check(
   datetime.column,
   persist.duration,
   min.variation,
-  fail.flag
+  realtime = FALSE
 )
 }
 \arguments{
@@ -27,20 +27,31 @@ the unit is 'second'.}
 
 \item{min.variation}{a positive number, the minimum required variability of observations.}
 
-\item{fail.flag}{a character/string that represents the name of flag where an
-observation fails the persistence check.}
+\item{realtime}{a logical. \code{TRUE} means processing in realtime,
+the attributes that includes pass percent would be removed in realtime case.}
 }
 \value{
 a new tbl_df that extends two new columns on the input data,
-the first added column `flag` represents the flags (`P` means pass, `fail.flag` means fail,
-`isolated` means missing previous observations), the second added column `new_data` represents
+the first added column \code{flag_persist} represents the flags (\code{P} means pass, \code{fail.persist} means fail,
+\code{isolated} means missing previous observations), the second added column \code{new_data_persist} represents
 the observation data after removing failed observations.
 }
 \description{
 Check on a minimum required variability of an instantaneous value;
-Observations should change more than a minimum required number `min.variation`,
-during a time interval of length `persist.duration`;
-Generating a new sequence of flags, where a `P` means that observation passes the persistence check,
-and a pre-defined flag name `fail.flag` means that observation fails the persistence check;
-Also outputting a new sequence of observations after removing failed observations.
+Observations should change more than a minimum required number \code{min.variation},
+during a time interval of length \code{persist.duration};
+Generating a new sequence of flags, and outputting a new sequence of observations after removing failed observations.
+}
+\examples{
+library(tidyverse)
+datetime = as.POSIXlt(seq(0,60000,600), origin = "2017-02-03 08:00:00")
+test_data = tibble(datetime = datetime,
+              windspeed = c(rep(10.2,5),rep(11.3,15),seq(10,15,0.1),
+                            rep(9.3,20),c(NA,NA,NA,2,NA,5,7,NA,2,4)))
+test_persist_check = temporal_persist_check(test_data, data.column = 'windspeed',
+                                            datetime.column = 'datetime',
+                                            persist.duration = 3600,
+                                            min.variation = 0.1)
+attributes(test_persist_check)
+test_persist_check
 }

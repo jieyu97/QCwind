@@ -4,30 +4,49 @@
 \alias{range_check}
 \title{Range check function}
 \usage{
-range_check(data, column, upper.bound, lower.bound = 0, fail.flag)
+range_check(
+  data,
+  data.column,
+  datetime.column,
+  upper.bound,
+  lower.bound = 0,
+  monthly.bounds = TRUE
+)
 }
 \arguments{
 \item{data}{a data.frame that includes observation data with information.}
 
-\item{column}{a character, the selected column name in the data.frame that
+\item{data.column}{a character, the selected column name in the data.frame that
 represents observation data to be checked.}
+
+\item{datetime.column}{a character, the selected column name in the data.frame that
+represents the reporting dates and times of corresponding observations.}
 
 \item{upper.bound}{a real number that controls the maximum allowed value of observations.}
 
 \item{lower.bound}{a real number that controls the minimum required value of observations (default value = 0).}
 
-\item{fail.flag}{a character/string that represents the name of flag where an observation fails the range check.}
+\item{monthly.bounds}{a logical, if \code{TRUE}, then the range check is performed with different monthly upper bounds,
+in this case the \code{upper.bound} and \code{lower.bound} must be a numeric vector of length 12,
+if \code{lower.bound} use default value, then there is no need to take actions.}
 }
 \value{
 a new tbl_df that extends two new columns on the input data,
-the first added column `flag` represents the flags (`P` means pass, `fail.flag` means fail,
-`missing` means missing values of observations), the second added column `new_data` represents
+the first added column \code{flag_range} represents the flags (\code{P} means pass, \code{fail.range} means fail,
+\code{missing} means missing values of observations), the second added column \code{new_data_range} represents
 the observation data after removing failed observations.
 }
 \description{
 Checking the plausible range of a sequence of observations;
-The observations should be no less than the `lower.bound` and no more than the `upper.bound`;
-Generating a new sequence of flags, where a `P` means that observation passes the range check,
-and a pre-defined flag name `fail.flag` means that observation fails the range check;
-Also outputting a new sequence of observations after removing failed observations.
+The observations should be no less than the \code{lower.bound} and no more than the \code{upper.bound};
+Generating a new sequence of flags, and outputting a new sequence of observations after removing failed observations.
+}
+\examples{
+library(tidyverse)
+datetime = as.POSIXct(seq(0,60000,600), origin = "2017-02-03 08:00:00")
+test_data = tibble(datetime = datetime,
+              windspeed = c(0:20,20:1,1:20,20:1,1:20))
+test_range_check = range_check(test_data, data.column = 'windspeed', datetime.column = 'datetime', upper.bound = c(11:22))
+attributes(test_range_check)
+test_range_check
 }

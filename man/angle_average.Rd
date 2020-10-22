@@ -10,7 +10,7 @@ angle_average(data)
 \item{data}{a numeric vector of angle degrees.}
 }
 \value{
-a number, the mean degree from the input `data`.
+a number, the mean degree from the input \code{data}.
 }
 \description{
 Calculating the circular average from a set of angle degrees.
