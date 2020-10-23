@@ -1,0 +1,24 @@
+{
+    "id": "A7B8776B",
+    "path": "E:/github/QCwind/R/eqm_bias_correction.R",
+    "project_path": "R/eqm_bias_correction.R",
+    "type": "r_source",
+    "hash": "233734584",
+    "contents": "",
+    "dirty": false,
+    "created": 1603364703555.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "cursorPosition": "59,21",
+        "scrollLine": "50"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1603359994,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1603359994,
+    "read_only": false,
+    "read_only_alternatives": []
+}
