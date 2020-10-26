@@ -36,7 +36,7 @@
 #' test_persist_check
 
 temporal_persist_check <- function(data, data.column, datetime.column,
-                                persist.duration, min.variation, realtime = FALSE)
+                                persist.duration, min.variation)
 {
   stopifnot(persist.duration > 0)
   stopifnot(min.variation > 0)
@@ -105,11 +105,8 @@ temporal_persist_check <- function(data, data.column, datetime.column,
   output_data = output_flag %>%
     mutate(new_data_persist = ifelse( flag_persist == "fail.persist", NA, center.data ) )
 
-  if (realtime == FALSE) {
-    attr(output_data, 'input_valid_data_percentage') = sum(!is.na(obs.data)) / length(obs.data)
-    attr(output_data, 'pass_percentage') = sum(!is.na(output_data$new_data_persist)) /
-      sum(!is.na(obs.data))
-  }
+  attr(output_data, 'persist_pass_percent') = sum(!is.na(output_data$new_data_persist)) /
+      sum(!is.na(obs.data)) * 100
 
   return(output_data)
 }

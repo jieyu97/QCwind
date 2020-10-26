@@ -116,7 +116,8 @@ temporal_step_check.improve <- function(data, data.column, datetime.column,
   output_data = output_flag %>%
     mutate(new_data_step = ifelse( flag_step == "fail.step", NA, center.data ) )
 
-  attr(output_data, 'step_pass_percent') = sum(!is.na(output_data$new_data_step)) / sum(!is.na(obs.data))
+  attr(output_data, 'step_pass_percent') = sum(!is.na(output_data$new_data_step)) /
+    sum(!is.na(obs.data)) * 100
 
   return(output_data)
 }
