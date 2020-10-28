@@ -1,5 +1,5 @@
 #' @name eqm_bc_5foldcv
-#' @title Calibrating the bias of observed data by empirical quantile 
+#' @title Calibrating the bias of observed data by empirical quantile
 #' mapping method with 5-fold cross-validation
 #' @description Performing empirical quantile distribution mapping to correct bias in the observation data,
 #' applying the 5-fold cross-validation;
@@ -14,9 +14,9 @@
 #' (100 quantiles in total).
 #' We use Weibull distribution with maximum likelihood estimation to fit these quantiles
 #' (in R package fitdistrplus).
-#' @return a list of two parts: one is the output dataframe `bc_output` that includes both 
-#' input and bias-corrected observation data; the other one is a large list `bc.eqm_model` 
-#' contains all the empirical quantile mapping models in each turn of cross-validation 
+#' @return a list of two parts: one is the output dataframe `bc_output` that includes both
+#' input and bias-corrected observation data; the other one is a large list `bc.eqm_model`
+#' contains all the empirical quantile mapping models in each turn of cross-validation
 #' during different season/period.
 #' @import stats
 #' @import tidyverse
@@ -29,7 +29,7 @@ eqm_bc_5foldcv = function(data.obs, data.datetime, true.quantiles)
   stopifnot(length(data.obs) == length(data.datetime))
   stopifnot(is.numeric(data.obs))
   stopifnot(is.POSIXct(data.datetime))
-  
+
   ## split datetime by season and by day/night time
   data.datetime_split = tibble(datetime = data.datetime,
                                month = month(data.datetime),
@@ -42,30 +42,30 @@ eqm_bc_5foldcv = function(data.obs, data.datetime, true.quantiles)
   data.datetime_split$season[ which( data.datetime_split$month %in% c(4,5,10,11) ) ] = 'trans'
   data.datetime_split$daytime[ which( data.datetime_split$hour %in% c(7:18) ) ] = 'day'
   data.datetime_split$period = paste0(data.datetime_split$season,'_',data.datetime_split$daytime)
-  
-  nonzero.data_label = which(data.obs != 0)
+
+  valid.data_label = which(!is.na(data.obs))
   zero.data_label = which(data.obs == 0)
   split_6period = c("winter_night","winter_day","trans_night","trans_day","summer_night","summer_day")
   for (period in 1:6) {
     each.period_label = which(data.datetime_split$period == split_6period[period])
-    each.period.nonzero_label = intersect(nonzero.data_label,each.period_label)
-    cv.fold.length = round(length(each.period.nonzero_label) / 5)
-    each.period.valid.fold1_label = each.period.nonzero_label[1:cv.fold.length]
-    each.period.valid.fold2_label = each.period.nonzero_label[(cv.fold.length+1):(2*cv.fold.length)]
-    each.period.valid.fold3_label = each.period.nonzero_label[(2*cv.fold.length+1):(3*cv.fold.length)]
-    each.period.valid.fold4_label = each.period.nonzero_label[(3*cv.fold.length+1):(4*cv.fold.length)]
-    each.period.valid.fold5_label = each.period.nonzero_label[(4*cv.fold.length+1):length(each.period.nonzero_label)]
+    each.period.valid_label = intersect(valid.data_label, each.period_label)
+    cv.fold.length = round(length(each.period.valid_label) / 5)
+    each.period.valid.fold1_label = each.period.valid_label[1:cv.fold.length]
+    each.period.valid.fold2_label = each.period.valid_label[(cv.fold.length+1):(2*cv.fold.length)]
+    each.period.valid.fold3_label = each.period.valid_label[(2*cv.fold.length+1):(3*cv.fold.length)]
+    each.period.valid.fold4_label = each.period.valid_label[(3*cv.fold.length+1):(4*cv.fold.length)]
+    each.period.valid.fold5_label = each.period.valid_label[(4*cv.fold.length+1):length(each.period.valid_label)]
     data.datetime_split$cv_fold[each.period.valid.fold1_label] = paste0(split_6period[period],"_","cvfold1")
     data.datetime_split$cv_fold[each.period.valid.fold2_label] = paste0(split_6period[period],"_","cvfold2")
     data.datetime_split$cv_fold[each.period.valid.fold3_label] = paste0(split_6period[period],"_","cvfold3")
     data.datetime_split$cv_fold[each.period.valid.fold4_label] = paste0(split_6period[period],"_","cvfold4")
     data.datetime_split$cv_fold[each.period.valid.fold5_label] = paste0(split_6period[period],"_","cvfold5")
   }
-  
+
   bc_output = data.datetime_split %>%
     dplyr::mutate(obs_before_BC = data.obs, data_after_BC = NA) %>%
     dplyr::select(datetime, period, cv_fold, obs_before_BC, data_after_BC)
-  
+
   bc.eqm_model = list()
   for (period in 1:6) {
     estimate_true_quantile = true.quantiles[[period]]
@@ -77,22 +77,22 @@ eqm_bc_5foldcv = function(data.obs, data.datetime, true.quantiles)
       validation.label = which(bc_output$cv_fold == validation.class)
       training.data = bc_output$obs_before_BC[training.label]
       validation.data = bc_output$obs_before_BC[validation.label]
-      
+
       model.number = 5*(period-1)+cv
       if (length(training.data) > 1000) {
         ecdf_training.data = ecdf(training.data)
         cumu.prob_validation.data = ecdf_training.data(validation.data)
         quantiles_validation.data = quantile(kriging_smooth_weibull, probs = cumu.prob_validation.data)
-        
+
         bc.eqm_model[[model.number]] = quantiles_validation.data
         attr(bc.eqm_model[[model.number]], "cross_validation_detail") = paste0("training data: ",training.class[1]," + ",
                                                                                training.class[2]," + ",training.class[3]," + ",
                                                                                training.class[4],"; validation data: ",
                                                                                validation.class)
-        
+
         bc.correct_validation.data = as.numeric(t(quantiles_validation.data$quantiles))
         bc.correct_validation.data[which(bc.correct_validation.data == Inf)] = max(estimate_true_quantile)
-        
+
         bc_output$data_after_BC[validation.label] = bc.correct_validation.data
       } else {
         bc.eqm_model[[model.number]] = "not enough training data"
@@ -103,8 +103,8 @@ eqm_bc_5foldcv = function(data.obs, data.datetime, true.quantiles)
       }
     }
   }
-  
+
   bc_output$data_after_BC[zero.data_label] = 0
-  
+
   return(list(bc_output, bc.eqm_model))
 }
