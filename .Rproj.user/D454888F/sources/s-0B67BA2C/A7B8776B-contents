@@ -65,7 +65,8 @@ eqm_bias_correction <- function(train.obs, train.datetime,
     kriging_smooth_weibull = fitdist(estimate_true_quantile,'weibull',method = "mle")
     kriging_correct_model = quantile(kriging_smooth_weibull, probs = obs_cumu_prob.period)
 
-    correct.obs_test.period = t(kriging_correct_model$quantiles)
+    correct.obs_test.period = as.numeric(t(kriging_correct_model$quantiles))
+    correct.obs_test.period[which(correct.obs_test.period == Inf)] = max(estimate_true_quantile)
     correct.test.obs[which(test.datetime_split$class == split_class[period])] = correct.obs_test.period
   }
 

@@ -27,5 +27,5 @@ a large list of interpolated quantiles for different test station, each sublist 
 estimate quantiles during each of the six periods.
 }
 \description{
-Find the kriging estimated "truth" quantiles of a given test station.
+Ordinary kriging.
 }

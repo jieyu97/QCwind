@@ -2,6 +2,7 @@
 
 export(angle_average)
 export(bias_correction)
+export(eqm_bc_5foldcv)
 export(eqm_bias_correction)
 export(internal_check_wind)
 export(interpolate_quantiles)

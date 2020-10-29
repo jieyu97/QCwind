@@ -9,8 +9,7 @@ temporal_persist_check(
   data.column,
   datetime.column,
   persist.duration,
-  min.variation,
-  realtime = FALSE
+  min.variation
 )
 }
 \arguments{
