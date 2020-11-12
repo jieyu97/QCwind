@@ -32,5 +32,5 @@ hello <- function() {
 # devtools::build_manual()
 # devtools::build_vignettes()
 #
-#
+# devtools::install_github("jieyu97/QCwind")
 # windrose_plot - add a simple example

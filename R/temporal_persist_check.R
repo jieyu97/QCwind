@@ -44,12 +44,12 @@ temporal_persist_check <- function(data, data.column, datetime.column,
   stopifnot(is.character(data.column), data.column %in% colnames(data))
   stopifnot(is.character(datetime.column), datetime.column %in% colnames(data))
 
-  Sys.setenv(TZ = "GMT")
+  Sys.setenv(TZ = "UTC")
 
   data = as_tibble(data)
   obs.data = data[[data.column]]    # data[,data.column]
   obs.datetime = data[[datetime.column]]    # data[,datetime.column]
-  attr(obs.datetime, 'tzone') = "GMT"
+  attr(obs.datetime, 'tzone') = "UTC"
   data = data[order(data[[datetime.column]]),]
 
   time_series = xts(x = obs.data, order.by = obs.datetime)
@@ -77,9 +77,9 @@ temporal_persist_check <- function(data, data.column, datetime.column,
   # flag - isolate, isolated observations
   start_label = str_c(data[[datetime.column]][1],'/',data[[datetime.column]][1] + persist.duration)
   ts_start = time_series[start_label]
-  label.center.isolate = union( union(
-    # which(!is.na(center.data) & is.na(lag.data) & is.na(lead.data)),
-    which(!is.na(center.data) & is.na(variation.data)) ),
+  label.center.isolate = union(
+    # union( which(!is.na(center.data) & is.na(lag.data) & is.na(lead.data)),
+    which(!is.na(center.data) & is.na(variation.data)),
     which(data[[datetime.column]] %in% index(ts_start)) )
   # flag - fail.persist, failed observations
   label.center.fail0 = which(variation.data <= min.variation)

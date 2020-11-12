@@ -37,13 +37,13 @@ temporal_step_check.improve <- function(data, data.column, datetime.column,
   stopifnot(is.character(data.column), data.column %in% colnames(data))
   stopifnot(is.character(datetime.column), datetime.column %in% colnames(data))
 
-  Sys.setenv(TZ = "GMT")
+  Sys.setenv(TZ = "UTC")
 
   # ensure the right order of date-times in the data.frame
   data = as_tibble(data)
   obs.data = data[[data.column]]    # data[,data.column]
   obs.datetime = data[[datetime.column]]    # data[,datetime.column]
-  attr(obs.datetime, 'tzone') = "GMT"
+  attr(obs.datetime, 'tzone') = "UTC"
   data = data[order(data[[datetime.column]]),]
 
   time_series = xts(x = obs.data, order.by = obs.datetime)
