@@ -21,10 +21,13 @@ jobs:
       - uses: r-lib/actions/setup-r@master
       - name: Install dependencies
         run: |
-          install.packages(c("remotes", "rcmdcheck"))
+          install.packages(c("remotes", "rcmdcheck", "devtools"))
           remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
       - name: Check
         run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
+        shell: Rscript {0}
+      - name: Build updation
+        run: devtools::document()
         shell: Rscript {0}
         
