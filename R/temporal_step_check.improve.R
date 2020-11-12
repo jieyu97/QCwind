@@ -67,7 +67,8 @@ temporal_step_check.improve <- function(data, data.column, datetime.column,
   lead.diff.data = abs(center.data - lead.data)
 
   label.center.na = which(is.na(center.data)) # flag - NA, no observaions
-  label.center.isolate = which(!is.na(center.data) & is.na(lag.data) & is.na(lead.data)) # flag - isolate, isolated observations
+  # label.center.isolate = which(!is.na(center.data) & is.na(lag.data) & is.na(lead.data))
+  label.center.isolate = which(!is.na(center.data) & is.na(variation.data)) # flag - isolate, isolated observations
   label.center.fail.left = which(!is.na(lag.data) & !is.na(center.data) &
                                    variation.data > max.variation &
                                    center.data > lag.data &
@@ -107,10 +108,10 @@ temporal_step_check.improve <- function(data, data.column, datetime.column,
                                     label.center.fail.between.right) # flag - fail.step, failed observations
 
   output_flag = data %>% mutate(flag_step = "P")
+  output_flag$flag_step[label.center.isolate] = "isolated"
   output_flag$flag_step[label.center.fail.between] = "fail.step"
   output_flag$flag_step[label.center.fail.left] = "fail.step"
   output_flag$flag_step[label.center.fail.right] = "fail.step"
-  output_flag$flag_step[label.center.isolate] = "isolated"
   output_flag$flag_step[label.center.na] = "missing"
 
   output_data = output_flag %>%

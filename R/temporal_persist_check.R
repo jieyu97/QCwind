@@ -78,7 +78,7 @@ temporal_persist_check <- function(data, data.column, datetime.column,
   start_label = str_c(data[[datetime.column]][1],'/',data[[datetime.column]][1] + persist.duration)
   ts_start = time_series[start_label]
   label.center.isolate = union( union(
-    which(!is.na(center.data) & is.na(lag.data) & is.na(lead.data)),
+    # which(!is.na(center.data) & is.na(lag.data) & is.na(lead.data)),
     which(!is.na(center.data) & is.na(variation.data)) ),
     which(data[[datetime.column]] %in% index(ts_start)) )
   # flag - fail.persist, failed observations
