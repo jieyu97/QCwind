@@ -62,8 +62,7 @@ temporal_persist_check <- function(data, data.column, datetime.column,
   # there are at least half valid (not NA) data to consider.
   variation.data = unlist( lapply(persist_dt_label, FUN = function(x){
     ts_interval = time_series[x]
-    diff.value = ifelse(sum(!is.na(ts_interval)) > persist.duration/600/2,
-                        max(ts_interval, na.rm = TRUE) - min(ts_interval, na.rm = TRUE), NA)
+    diff.value = max(ts_interval, na.rm = TRUE) - min(ts_interval, na.rm = TRUE)
     return(diff.value)
   }) )
 
@@ -77,10 +76,10 @@ temporal_persist_check <- function(data, data.column, datetime.column,
   # flag - isolate, isolated observations
   start_label = str_c(data[[datetime.column]][1],'/',data[[datetime.column]][1] + persist.duration)
   ts_start = time_series[start_label]
-  label.center.isolate = union(
+  # label.center.isolate = union(
     # union( which(!is.na(center.data) & is.na(lag.data) & is.na(lead.data)),
-    which(!is.na(center.data) & is.na(variation.data)),
-    which(data[[datetime.column]] %in% index(ts_start)) )
+    # which(!is.na(center.data) & is.na(variation.data)),
+  label.center.start = which(data[[datetime.column]] %in% index(ts_start))
   # flag - fail.persist, failed observations
   label.center.fail0 = which(variation.data <= min.variation)
   if (length(label.center.fail0) > 0) {
@@ -99,7 +98,7 @@ temporal_persist_check <- function(data, data.column, datetime.column,
 
   output_flag = data %>% mutate(flag_persist = "P")
   output_flag$flag_persist[label.center.fail] = "fail.persist"
-  output_flag$flag_persist[label.center.isolate] = "isolated"
+  output_flag$flag_persist[label.center.start] = "beginning"
   output_flag$flag_persist[label.center.na] = "missing"
 
   output_data = output_flag %>%
