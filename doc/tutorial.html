@@ -520,7 +520,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb6-12"><a href="#cb6-12"></a>wow_windspeed.afterBC =<span class="st"> </span><span class="kw">list</span>()</span>
 <span id="cb6-13"><a href="#cb6-13"></a><span class="cf">for</span> (w <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">39</span>) {</span>
 <span id="cb6-14"><a href="#cb6-14"></a>  <span class="kw">print</span>(<span class="kw">Sys.time</span>())</span>
-<span id="cb6-15"><a href="#cb6-15"></a>  wow_single_beforeBC =<span class="st"> </span>wow_windspeed.uniform_beforeBC[[w]]</span>
+<span id="cb6-15"><a href="#cb6-15"></a>  wow_single_beforeBC =<span class="st"> </span>wow_windspeed.uniform_standardQC[[w]]</span>
 <span id="cb6-16"><a href="#cb6-16"></a>  wow_single_afterBC =<span class="st"> </span>wow_single_beforeBC <span class="op">%&gt;%</span></span>
 <span id="cb6-17"><a href="#cb6-17"></a><span class="st">    </span><span class="kw">mutate</span>(<span class="dt">new_data_bc =</span> <span class="ot">NA</span>)</span>
 <span id="cb6-18"><a href="#cb6-18"></a>  wow_single_afterBC<span class="op">$</span>new_data_bc =<span class="st"> </span><span class="kw">eqm_bias_correction</span>(</span>

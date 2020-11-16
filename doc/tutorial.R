@@ -182,7 +182,7 @@ knitr::opts_chunk$set(echo = TRUE)
 #  wow_windspeed.afterBC = list()
 #  for (w in 1:39) {
 #    print(Sys.time())
-#    wow_single_beforeBC = wow_windspeed.uniform_beforeBC[[w]]
+#    wow_single_beforeBC = wow_windspeed.uniform_standardQC[[w]]
 #    wow_single_afterBC = wow_single_beforeBC %>%
 #      mutate(new_data_bc = NA)
 #    wow_single_afterBC$new_data_bc = eqm_bias_correction(
