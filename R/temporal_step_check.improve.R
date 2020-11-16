@@ -54,7 +54,8 @@ temporal_step_check.improve <- function(data, data.column, datetime.column,
   variation.data = unlist( lapply(step_dt_label, FUN = function(x){
     ts_interval = time_series[x]
     diff.value = ifelse(sum(!is.na(ts_interval)) > 1,
-                        max(ts_interval, na.rm = TRUE) - min(ts_interval, na.rm = TRUE), NA)
+                        max(ts_interval, na.rm = TRUE) - min(ts_interval, na.rm = TRUE),
+                        NA)
     return(diff.value)
   }) )
 
