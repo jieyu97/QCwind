@@ -117,61 +117,71 @@ library(QCwind)
 library(xts)
 library(zoo)
 library(lubridate)
+library(tidyverse)
+
 w = 11
 
-wow_windspeed.after_standardQC = c()
-wow_windspeed.uniform_beforeBC = c()
+wow_windspeed.uniform_standardQC = c()
 
 for (w in 1:39) {
   
 wow_single = wow_windspeed_each[[w]]
+
 # 1. range check
-wow_single_range = range_check(wow_single, data.column = 'windspeed', datetime.column = 'datetime', 
-                               upper.bound = c(33.4,29.8,29.8,29.8,26.2,23.1,25.0,26.8,35.0,31.0,30.9,32.4))
+wow_single_range = range_check(wow_single, 
+                               data.column = 'windspeed', 
+                               datetime.column = 'datetime', 
+                               upper.bound = 
+                                 c(33.4,29.8,29.8,29.8,26.2,23.1,25.0,26.8,35.0,31.0,30.9,32.4))
 attributes(wow_single_range)
+
 
 # 2. step check
 Sys.time() # 2min per station
-wow_single_step = temporal_step_check.improve(wow_single_range, data.column = 'windspeed', datetime.column = 'datetime',
-                    step.duration = 660, max.variation = 15.51)
+wow_single_step = temporal_step_check.improve(wow_single_range, 
+                                              data.column = 'new_data_range', 
+                                              datetime.column = 'datetime',
+                                              step.duration = 660, 
+                                              max.variation = 13.88)
 Sys.time()
 attributes(wow_single_step)
 
+
+# uniform time series
+datetime_sequence = seq.POSIXt(lubridate::ymd_hms('2016-01-01 00:00:00 UTC'),
+                               lubridate::ymd_hms('2019-01-01 00:00:00 UTC'), 
+                               units = "seconds", by = 600)
+wow_single_step.uniform.xts = uniform_data(data = wow_single_step, 
+                                           data.column = 'new_data_step', 
+                                           datetime.column = 'datetime',
+                                           timeseq = datetime_sequence)
+wow_single_step.uniform = tibble(station_id = wow_single_step$station_id[1], 
+                                 datetime = datetime_sequence,
+                                 windspeed_uniform = as.numeric(coredata(wow_single_step.uniform.xts)) )                                   
+                                   
 # 3. persist check
-Sys.time() # 3min per station
-wow_single_persist = temporal_persist_check(wow_single_step, data.column = 'windspeed', datetime.column = 'datetime',
-                       persist.duration = 16*600, min.variation = 0.05)
+Sys.time() 
+wow_single_persist.normal = temporal_persist_check(wow_single_step.uniform, 
+                                                   data.column = 'windspeed_uniform', 
+                                                   datetime.column = 'datetime',
+                                                   persist.duration = 16*600, min.variation = 0.05)
 Sys.time()
-attributes(wow_single_persist)
+wow_single_persist.extend = temporal_persist_check(wow_single_step.uniform, 
+                                                   data.column = 'windspeed_uniform', 
+                                                   datetime.column = 'datetime',
+                                                   persist.duration = 864*600, min.variation = 0.05)
+Sys.time()
 
-wow_windspeed.after_standardQC[[w]] = wow_single_persist
-
-### transfer to the uniform time series with 10-min timestamp resolution.
-print(Sys.time()) #4min
-zero_before = which(wow_single_persist$windspeed == 0)
-nonzero_after = which(wow_single_persist$new_data_persist != 0)
-
-uniform.zero_before = uniform_data(data = wow_single_persist[zero_before,], data.column = 'windspeed', 
-                                   datetime.column = 'datetime',
-                                   timeseq = datetime_sequence)
-uniform.nonzero_after = uniform_data(data = wow_single_persist[nonzero_after,], data.column = 'windspeed',
-                                     datetime.column = 'datetime',
-                                     timeseq = datetime_sequence)
-
-replace_label = which(!is.na(coredata(uniform.nonzero_after)))
-uniform.zero_before[replace_label] = uniform.nonzero_after[replace_label]
-
-wow_single_uniform = tibble(station_id = wow_single_persist$station_id[1],
-                            datetime = datetime_sequence,
-                            windspeed_before_bc = as.numeric(coredata(uniform.zero_before)))
-print(Sys.time())
-
-wow_windspeed.uniform_beforeBC[[w]] = wow_single_uniform
+wow_single_persist = wow_single_persist.normal %>%
+  mutate(flag_persist_longzeros = wow_single_persist.extend$flag_persist) %>%
+  mutate(new_data_persist_longzeros = wow_single_persist.extend$new_data_persist)
+wow_windspeed.uniform_standardQC[[w]] = wow_single_persist
 
 }
 
 save.image("~/Documents/wow.after_standardQC.RData")
 Sys.time()
+
 ```
 
 ```{r eval=F, echo=T}
