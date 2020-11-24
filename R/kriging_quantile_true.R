@@ -23,7 +23,7 @@
 #' Each sublist includes estimated quantiles from 0.01 to 1 at thousands of new locations.
 #' @import tidyverse
 #' @import gstat
-#' @importFrom sp spTransform
+#' @import sp
 #' @importFrom lubridate month hour
 #' @importFrom automap autoKrige
 #' @export

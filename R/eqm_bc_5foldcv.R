@@ -44,7 +44,7 @@ eqm_bc_5foldcv = function(data.obs, data.datetime, true.quantiles)
   data.datetime_split$period = paste0(data.datetime_split$season,'_',data.datetime_split$daytime)
 
   valid.data_label = which(!is.na(data.obs))
-  zero.data_label = which(data.obs == 0)
+  # zero.data_label = which(data.obs == 0)
   split_6period = c("winter_night","winter_day","trans_night","trans_day","summer_night","summer_day")
   for (period in 1:6) {
     each.period_label = which(data.datetime_split$period == split_6period[period])
@@ -104,7 +104,7 @@ eqm_bc_5foldcv = function(data.obs, data.datetime, true.quantiles)
     }
   }
 
-  bc_output$data_after_BC[zero.data_label] = 0
+  # bc_output$data_after_BC[zero.data_label] = 0
 
   return(list(bc_output, bc.eqm_model))
 }

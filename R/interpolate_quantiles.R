@@ -11,7 +11,7 @@
 #' estimate quantiles during each of the six periods.
 #' @import tidyverse
 #' @import gstat
-#' @importFrom sp spTransform
+#' @import sp
 #' @export
 
 interpolate_quantiles = function(kriging.reference.quantiles, station.id,
