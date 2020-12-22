@@ -1,6 +1,17 @@
-####### function 3: iemdw for spatial consistency check
-
-library(truncnorm)
+#' @name spatial_check
+#' @title Spatial consistency check using inverse Earth mover's distance weighting method
+#' @description Flag and reject inconsistent observations in space.
+#' @param test.station.windspeed.nonzero a data.frame that includes observation data of all test
+#' stations, with no zeros.
+#' @param official.station.windspeed a data.frame that includes observation data of official stations.
+#' @param test.nbhd_spatial.info output of function `spatial_neighbors`.
+#' @param order_spatial.test_station output of function `spatial_order`.
+#' @return a large list of three data.frames:
+#' new_windspeed: observations after filtering spatially inconsistent ones;
+#' flags: flag of each observation;
+#' iemdw_estimates: inverse Earth mover's distance weighting estimates of each observation.
+#' @importFrom truncnorm qtruncnorm
+#' @export
 
 spatial_check = function(test.station.windspeed.nonzero, official.station.windspeed,
                          test.nbhd_spatial.info, order_spatial.test_station)

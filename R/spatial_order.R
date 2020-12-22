@@ -1,4 +1,10 @@
-####### function 2: get perform order
+#' @name spatial_order
+#' @title Implementing order of test stations
+#' @description Find an optimal order of test stations when performing the spatial consistency check.
+#' @param test_station.scores a data.frame that includes the quality score of test stations.
+#' @param test.nbhd_spatial.info output of function `spatial_neighbors`.
+#' @return a numeric sequence that shows the order of test stations in their column numbers.
+#' @export
 
 spatial_order = function(test_station.scores, test.nbhd_spatial.info)
 {

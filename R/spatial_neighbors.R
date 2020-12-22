@@ -1,15 +1,28 @@
-####### function 1: select neighbours
+#' @name spatial_neighbors
+#' @title Selecting neighbors for each test station
+#' @description Selecting neighbors for each test station according to geographical distance,
+#' correlation, Earth mover's distance.
+#' @param test.station.windspeed a data.frame that includes observation data of all test stations.
+#' @param official.station.windspeed a data.frame that includes observation data of official stations.
+#' @param test.station.info a tbl_df that includes 'station_id', 'longitude', 'latitude' of test stations,
+#' corresponding to their column number in `test.station.windspeed`.
+#' @param official.station.info a tbl_df that includes 'location', 'longitude', 'latitude' of official
+#' stations, corresponding to their column number in `official.station.windspeed`.
+#' @param emd_radius the maximum radius of Earth mover's distance, setting 1 as default.
+#' @return a large list, each element is a data.frame that contains information of selected neighbors.
+#' @import tidyverse
+#' @importFrom transport wasserstein1d
+#' @importFrom geosphere distm
+#' @export
 
-require(tidyverse)
-require(transport)
 spatial_neighbors = function(test.station.windspeed, official.station.windspeed,
                              test.station.info, official.station.info,
                              emd_radius = 1)
 {
   stopifnot(is.data.frame(test.station.windspeed), is.data.frame(official.station.windspeed))
   stopifnot(nrow(test.station.windspeed) == nrow(official.station.windspeed))
-  stopifnot(ncol(test.station.windspeed) = nrow(test.station.info))
-  stopifnot(ncol(official.station.windspeed) = nrow(official.station.info))
+  stopifnot(ncol(test.station.windspeed) == nrow(test.station.info))
+  stopifnot(ncol(official.station.windspeed) == nrow(official.station.info))
   stopifnot("longitute" %in% colnames(test.station.info), "latitude" %in% colnames(test.station.info))
   stopifnot("longitute" %in% colnames(official.station.info), "latitude" %in% colnames(official.station.info))
 

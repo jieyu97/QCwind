@@ -1,9 +1,15 @@
-####### function 4: correct zeros
-
-# input
-test.station.windspeed = wow_windspeed.zero.final
-official.station.windspeed = knmi_windspeed
-test_windspeed.afterSpatialQC.nonzero = wow_windspeed.afterSpatialQC.nonzero
+#' @name estimate_zeros
+#' @title Estimating zeros
+#' @description Provide estimates of zero observations cause by systematic under-estimation, using
+#' inverse Earth mover's distance weighting method for interpolations.
+#' @param test_windspeed.afterSpatialQC.nonzero a data.frame that includes observation data after spatial
+#' consistency check, with no zeros.
+#' @param test.station.windspeed a data.frame that includes observation data of test stations before
+#' spatial consistency check.
+#' @param official.station.windspeed a data.frame that includes observation data of official stations.
+#' @param test.nbhd_spatial.info output of function `spatial_neighbors`.
+#' @return a new data.frame that includes wind speed observations after estimating zeros.
+#' @export
 
 estimate_zeros = function(test_windspeed.afterSpatialQC.nonzero,
                           test.station.windspeed,
