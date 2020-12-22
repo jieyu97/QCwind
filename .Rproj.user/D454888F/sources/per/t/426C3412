@@ -1,0 +1,24 @@
+{
+    "id": "426C3412",
+    "path": "E:/github/QCwind/R/spatial_check.R",
+    "project_path": "R/spatial_check.R",
+    "type": "r_source",
+    "hash": "1584109406",
+    "contents": "",
+    "dirty": false,
+    "created": 1608649522473.0,
+    "source_on_save": false,
+    "relative_order": 8,
+    "properties": {
+        "cursorPosition": "89,8",
+        "scrollLine": "73"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1608649540,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1608649540585,
+    "read_only": false,
+    "read_only_alternatives": []
+}

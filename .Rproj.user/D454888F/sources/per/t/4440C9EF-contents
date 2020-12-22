@@ -50,12 +50,17 @@ temporal_persist_check <- function(data, data.column, datetime.column,
   obs.data = data[[data.column]]    # data[,data.column]
   obs.datetime = data[[datetime.column]]    # data[,datetime.column]
   attr(obs.datetime, 'tzone') = "UTC"
-  data = data[order(data[[datetime.column]]),]
+
+  label.notna = which(!is.na(obs.data))
+
+  data = data[order(data[[datetime.column]]), ]
 
   time_series = xts(x = obs.data, order.by = obs.datetime)
-  persist_dt_seq = tibble(start = obs.datetime - persist.duration, end = obs.datetime + 0)
-  persist_dt_seq = persist_dt_seq[order(persist_dt_seq$start),]
-  persist_dt_label = str_c(persist_dt_seq$start,'/',persist_dt_seq$end)
+
+  persist_dt_seq = tibble(start = obs.datetime[label.notna] - persist.duration,
+                          end = obs.datetime[label.notna] + 0)
+  persist_dt_seq = persist_dt_seq[order(persist_dt_seq$start), ]
+  persist_dt_label = str_c(persist_dt_seq$start, "/", persist_dt_seq$end)
 
   # choose a number `persist.duration/600/2`:
   # ensure when checking the persistence of data in the time window,
