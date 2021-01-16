@@ -1,0 +1,24 @@
+{
+    "id": "C89A2577",
+    "path": "E:/github/QCwind/R/spatial_neighbors.R",
+    "project_path": "R/spatial_neighbors.R",
+    "type": "r_source",
+    "hash": "2880542624",
+    "contents": "",
+    "dirty": false,
+    "created": 1610806260311.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "cursorPosition": "169,0",
+        "scrollLine": "160"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1610806485,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1610806485581,
+    "read_only": false,
+    "read_only_alternatives": []
+}
