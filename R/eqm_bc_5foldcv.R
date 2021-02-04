@@ -20,7 +20,8 @@
 #' during different season/period.
 #' @import stats
 #' @import tidyverse
-#' @importFrom lubridate month hour
+#' @importFrom dplyr tibble %>%
+#' @importFrom lubridate month hour is.POSIXct
 #' @importFrom fitdistrplus fitdist
 #' @export
 

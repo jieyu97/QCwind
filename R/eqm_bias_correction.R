@@ -17,6 +17,7 @@
 #' @return a numeric vector that contains the corrected `test_after_bc` for the test data.
 #' @import stats
 #' @import tidyverse
+#' @importFrom dplyr tibble
 #' @importFrom lubridate month hour
 #' @importFrom fitdistrplus fitdist
 #' @export

@@ -25,9 +25,6 @@ represents the reporting dates and times of corresponding observations.}
 the unit is 'second'.}
 
 \item{min.variation}{a positive number, the minimum required variability of observations.}
-
-\item{realtime}{a logical. \code{TRUE} means processing in realtime,
-the attributes that includes pass percent would be removed in realtime case.}
 }
 \value{
 a new tbl_df that extends two new columns on the input data,

@@ -10,6 +10,7 @@
 #' @return a large list of interpolated quantiles for different test station, each sublist includes
 #' estimate quantiles during each of the six periods.
 #' @import tidyverse
+#' @importFrom dplyr tibble
 #' @import gstat
 #' @import sp
 #' @export

@@ -16,7 +16,9 @@ RoxygenNote: 7.1.1
 Depends: R (>= 3.5.0)
 Imports: base, 
         stats, 
+        dplyr,
         tidyverse, 
+        stringr, 
         lubridate, 
         ggplot2,
         xts, 

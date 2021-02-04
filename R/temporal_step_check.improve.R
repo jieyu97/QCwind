@@ -14,6 +14,8 @@
 #' the observation data after removing failed observations in the step check.
 #' @import xts
 #' @import tidyverse
+#' @importFrom dplyr tibble %>% mutate as_tibble
+#' @importFrom stringr str_c
 #' @importFrom zoo coredata index
 #' @export
 #' @examples

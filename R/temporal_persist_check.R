@@ -12,15 +12,15 @@
 #' @param persist.duration a positive number, the interval time for persistence test,
 #' the unit is 'second'.
 #' @param min.variation a positive number, the minimum required variability of observations.
-#' @param realtime a logical. `TRUE` means processing in realtime,
-#' the attributes that includes pass percent would be removed in realtime case.
 #' @return a new tbl_df that extends two new columns on the input data,
 #' the first added column `flag_persist` represents the flags (`P` means pass, `fail.persist` means fail,
 #' `isolated` means missing previous observations), the second added column `new_data_persist` represents
 #' the observation data after removing failed observations.
 #' @import xts
 #' @import tidyverse
+#' @importFrom dplyr tibble %>% mutate as_tibble
 #' @importFrom zoo coredata index
+#' @importFrom stringr str_c
 #' @export
 #' @examples
 #' library(tidyverse)

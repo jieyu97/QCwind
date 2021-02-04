@@ -24,6 +24,7 @@
 #' @import tidyverse
 #' @import gstat
 #' @import sp
+#' @importFrom dplyr tibble %>%
 #' @importFrom lubridate month hour
 #' @importFrom automap autoKrige
 #' @export

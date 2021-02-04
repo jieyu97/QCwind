@@ -18,6 +18,7 @@
 #' `missing` means missing values of observations), the second added column `new_data_range` represents
 #' the observation data after removing failed observations.
 #' @import tidyverse
+#' @importFrom dplyr tibble %>% mutate if_else as_tibble
 #' @importFrom lubridate month
 #' @export
 #' @examples

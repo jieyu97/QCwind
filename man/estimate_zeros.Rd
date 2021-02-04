@@ -8,7 +8,8 @@ estimate_zeros(
   test_windspeed.afterSpatialQC.nonzero,
   test.station.windspeed,
   official.station.windspeed,
-  test.nbhd_spatial.info
+  test.nbhd_spatial.info,
+  official.data.estimate = TRUE
 )
 }
 \arguments{
@@ -21,6 +22,12 @@ spatial consistency check.}
 \item{official.station.windspeed}{a data.frame that includes observation data of official stations.}
 
 \item{test.nbhd_spatial.info}{output of function \code{spatial_neighbors}.}
+
+\item{official.data.estimate}{a logical variable that determines whether to include CWS data in
+estimating zeros.
+We set the default as \code{TRUE}, meaning that we use only official data in the estimation.
+If there are not enough neighboring official stations, we could then set \code{official.data.estimate = FALSE}
+to use both official and CWS data for the estimation.}
 }
 \value{
 a new data.frame that includes wind speed observations after estimating zeros.

@@ -14,6 +14,7 @@
 #' the wind speed observations after removing failed observations, the third added column
 #' `new_windgust` represents the wind gust observations after removing failed observations.
 #' @import tidyverse
+#' @importFrom dplyr tibble %>% mutate if_else as_tibble
 #' @export
 #' @examples
 #' library(tidyverse)

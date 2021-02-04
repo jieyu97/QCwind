@@ -11,6 +11,8 @@
 #' flags: flag of each observation;
 #' iemdw_estimates: inverse Earth mover's distance weighting estimates of each observation.
 #' @importFrom truncnorm qtruncnorm
+#' @import tidyverse
+#' @importFrom dplyr tibble
 #' @export
 
 spatial_check = function(test.station.windspeed.nonzero, official.station.windspeed,

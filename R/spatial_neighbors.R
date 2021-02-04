@@ -11,6 +11,7 @@
 #' @param emd_radius the maximum radius of Earth mover's distance, setting 1 as default.
 #' @return a large list, each element is a data.frame that contains information of selected neighbors.
 #' @import tidyverse
+#' @importFrom dplyr tibble
 #' @importFrom transport wasserstein1d
 #' @importFrom geosphere distm
 #' @export

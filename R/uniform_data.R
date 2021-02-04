@@ -23,6 +23,8 @@
 #' @return a new matched time series, with standard reporting time every `interval` minutes.
 #' @import xts
 #' @import tidyverse
+#' @importFrom dplyr tibble
+#' @importFrom stringr str_c
 #' @export
 #' @examples
 #' library(tidyverse)
