@@ -29,8 +29,7 @@ Imports: base,
         transport,
         truncnorm,
         sp,  
-        fitdistrplus, 
-        rgdal, 
+        fitdistrplus,  
         RColorBrewer
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
