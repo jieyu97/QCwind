@@ -1,19 +1,17 @@
 {
-    "id": "F7C267BD",
-    "path": "~/GitHub/QCwind/R/temporal_step_check.improve.R",
-    "project_path": "R/temporal_step_check.improve.R",
+    "id": "26073781",
+    "path": "~/GitHub/QCwind/R/angle_average.R",
+    "project_path": "R/angle_average.R",
     "type": "r_source",
-    "hash": "4248003763",
+    "hash": "2243991871",
     "contents": "",
     "dirty": false,
-    "created": 1623241793948.0,
+    "created": 1623842844167.0,
     "source_on_save": false,
     "relative_order": 2,
     "properties": {
         "source_window_id": "",
-        "Source": "Source",
-        "cursorPosition": "0,0",
-        "scrollLine": "0"
+        "Source": "Source"
     },
     "folds": "",
     "lastKnownWriteTime": 1623241720,
