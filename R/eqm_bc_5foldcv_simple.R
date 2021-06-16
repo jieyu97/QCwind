@@ -70,6 +70,8 @@ eqm_bc_5foldcv_simple = function(data.obs, data.datetime, true.quantiles)
     estimate_true_quantile = true.quantiles[[period]]
     sorted_quantile = sort(estimate_true_quantile)
 
+    percentiles = seq(0,1,0.01)
+    percentiles_value = c(0,sorted_quantile)
     # kriging_smooth_weibull = fitdist(estimate_true_quantile,'weibull',method = "mle")
     for (cv in 1:5) {
       training.class = paste0(split_6period[period],"_","cvfold",setdiff(1:5,cv))
@@ -83,9 +85,6 @@ eqm_bc_5foldcv_simple = function(data.obs, data.datetime, true.quantiles)
       if (length(training.data) > 1000) {
         ecdf_training.data = ecdf(training.data)
         cumu.prob_validation.data = ecdf_training.data(validation.data)
-
-        percentiles = seq(0,1,0.01)
-        percentiles_value = c(0,sorted_quantile)
 
         # piecewise linear function based on percentiles and percentiles_values, as the true cdf:
         quantiles_validation.data = unlist( lapply(cumu.prob_validation.data, function(x){

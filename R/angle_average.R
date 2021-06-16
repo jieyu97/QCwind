@@ -4,10 +4,6 @@
 #' @param data a numeric vector of angle degrees.
 #' @return a number, the mean degree from the input `data`.
 #' @export
-#' @examples
-#' # calculate the average angle of the three: 350, 5, 20
-#' deg.ave = angle_average(data = c(350, 5, 20))
-#' deg.ave
 
 angle_average = function(data)
 {
